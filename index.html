@@ -226,7 +226,7 @@
         <div class="form-group">
             <label for="judgement">Judgement</label>
             <select id="judgement">
-                <option value="">Select an outcome</option>
+                <option value="">Select</option>
                 <option value="Correct">Correct</option>
                 <option value="Incorrect">Incorrect</option>
             </select>
@@ -234,7 +234,7 @@
 
         <div class="form-group">
             <label for="notes">Notes (Optional)</label>
-            <textarea id="notes" placeholder="Add specific context, tags, or timestamps here..."></textarea>
+            <textarea id="notes" placeholder="Feel free to add any additional context here."></textarea>
         </div>
 
         <button id="submitBtn" onclick="submitResult()">Submit Review</button>
@@ -242,13 +242,13 @@
 
     <div id="finishedSection" class="hidden">
         <h3>All reviews completed</h3>
-        <p>Your adjustments have been logged to the submission matrix successfully.</p>
+        <p>Thank you for your participation!</p>
     </div>
 </div>
 
 <script>
     // Embedded Deployed Google Apps Script Endpoint
-    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxaBa_Qx5s0YnJ5qfppOMfty9cRCBsiuX2L9EmRg_YjfnxNkEe6DPDGfP1vzD54RCSbUA/exec'; 
+    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwGakrByEE_KgzcUJCKvYC1kWOaVwg-ELlyLDCpx-avX32RZi8KPX4dVJeAprFVYSTHMQ/exec'; 
     
     let allDataMaster = [];
     let allAssignedVideos = []; 
