@@ -18,9 +18,28 @@ document.addEventListener('keydown', function(event) {
 });
 
 function initializeApplication() {
-    // Hide loading, show login immediately since we don't fetch data until they log in
+    const savedUser = localStorage.getItem("currentUser");
+    const savedVideos = localStorage.getItem("assignedVideos");
+
+    if (savedUser && savedVideos) {
+        // Retrieve and convert the string back into an object/array
+        currentUser = savedUser;
+        allAssignedVideos = JSON.parse(savedVideos);
+
+        document.getElementById("loginSection").classList.add("hidden");
+        
+        if (allAssignedVideos.length > 0) {
+            document.getElementById("playerSection").classList.remove("hidden");
+            document.getElementById("totalCount").innerText = allAssignedVideos.length;
+            loadVideo(currentIndex);
+        } else {
+            document.getElementById("finishedSection").classList.remove("hidden");
+        }
+    } else {
+        document.getElementById("loginSection").classList.remove("hidden");
+    }
+    
     document.getElementById("loadingMsg").classList.add("hidden");
-    document.getElementById("loginSection").classList.remove("hidden");
 }
 
 async function attemptLogin() {
@@ -51,27 +70,30 @@ async function attemptLogin() {
         
         const result = await response.json();
 
-        if (response.ok && result.success) {
-            currentUser = result.username;
-            allAssignedVideos = result.assignedVideos;
+if (response.ok && result.success) {
+    currentUser = result.username;
+    allAssignedVideos = result.assignedVideos;
 
-            document.getElementById("loginSection").classList.add("hidden");
-            
-            if (allAssignedVideos.length > 0) {
-                document.getElementById("playerSection").classList.remove("hidden");
-                document.getElementById("totalCount").innerText = allAssignedVideos.length;
-                loadVideo(currentIndex);
-            } else {
-                document.getElementById("finishedSection").classList.remove("hidden");
-            }
-        } else {
-            // Login failed
-            loginError.innerText = result.message || "Invalid UID or Password.";
-            loginError.classList.remove("hidden");
-            loginBtn.innerText = "Login";
-            loginBtn.disabled = false;
-        }
+    // Save session data to localStorage
+    localStorage.setItem("currentUser", currentUser);
+    localStorage.setItem("assignedVideos", JSON.stringify(allAssignedVideos));
 
+    document.getElementById("loginSection").classList.add("hidden");
+    
+    if (allAssignedVideos.length > 0) {
+        document.getElementById("playerSection").classList.remove("hidden");
+        document.getElementById("totalCount").innerText = allAssignedVideos.length;
+        loadVideo(currentIndex);
+    } else {
+        document.getElementById("finishedSection").classList.remove("hidden");
+    }
+} else {
+    // Login failed
+    loginError.innerText = result.message || "Invalid UID or Password.";
+    loginError.classList.remove("hidden");
+    loginBtn.innerText = "Login";
+    loginBtn.disabled = false;
+}
     } catch (error) {
     console.error("Login error details:", error);
     // This will now show the actual error on the screen
