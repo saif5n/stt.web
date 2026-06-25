@@ -73,11 +73,12 @@ async function attemptLogin() {
         }
 
     } catch (error) {
-        console.error("Login error:", error);
-        loginError.innerText = "Connection error. Please try again.";
-        loginError.classList.remove("hidden");
-        loginBtn.innerText = "Login";
-        loginBtn.disabled = false;
+    console.error("Login error details:", error);
+    // This will now show the actual error on the screen
+    loginError.innerText = "Error: " + error.message; 
+    loginError.classList.remove("hidden");
+    loginBtn.innerText = "Login";
+    loginBtn.disabled = false;
     }
 }
 
