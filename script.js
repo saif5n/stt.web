@@ -237,20 +237,32 @@ async function executeSave(judgement, notes) {
 function moveNext() {
     currentIndex++;
     
-    // SAVE THE PROGRESS
+    // Save current progress in case they refresh before finishing
     localStorage.setItem("currentIndex", currentIndex);
 
     const progressSection = document.getElementById("progressSection");
+    
     setTimeout(() => {
         progressSection.classList.add("hidden");
+        
         if (currentIndex < allAssignedVideos.length) {
+            // Still have videos, keep playing
             document.getElementById("playerSection").classList.remove("hidden");
             loadVideo(currentIndex);
         } else {
-            document.getElementById("finishedSection").classList.remove("hidden");
-            // Clear storage when finished
+            // FINISHED ALL VIDEOS
+            // 1. Force Logout: Clear all session data
+            localStorage.removeItem("currentUser");
             localStorage.removeItem("assignedVideos");
-            localStorage.removeItem("currentIndex"); // Add this
+            localStorage.removeItem("currentIndex");
+
+            // 2. Update UI
+            document.getElementById("playerSection").classList.add("hidden");
+            document.getElementById("finishedSection").classList.remove("hidden");
+            
+            // Optional: Provide instructions
+            document.getElementById("finishedSection").innerHTML += 
+                "<p>Session expired. Please <a href='javascript:location.reload()'>click here</a> to log in for new assignments.</p>";
         }
     }, 300); 
 }
