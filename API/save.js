@@ -7,7 +7,7 @@ const auth = new google.auth.GoogleAuth({
 });
 
 export default async function handler(req, res) {
-  if (req.method !== 'POST') return res.status(405).send('Method not allowed');
+  if (req.method !== 'POST') return res.status(405).send('Method not allowed.');
   
   const sheets = google.sheets({ version: 'v4', auth });
   const { username, url, judgement, notes } = req.body;
