@@ -198,6 +198,9 @@ function skipResult() {
 async function executeSave(judgement, notes) {
     document.getElementById("playerSection").classList.add("hidden");
     const progressSection = document.getElementById("progressSection");
+    // Calculate videos remaining after this submission
+    const remaining = allAssignedVideos.length - (currentIndex + 1);
+    document.getElementById("videosLeftText").innerText = `${remaining} video(s) remaining to review`;
     progressSection.classList.remove("hidden");
     
     const currentVideo = allAssignedVideos[currentIndex];
@@ -265,4 +268,44 @@ function moveNext() {
                 "<p>Session expired. Please <a href='javascript:location.reload()'>click here</a> to log in for new assignments.</p>";
         }
     }, 300); 
+}
+
+async function fetchAssignedVideos(uid, showLoading = true) {
+    if (showLoading) document.getElementById("loadingMsg").innerText = "Syncing...";
+    
+    try {
+        const response = await fetch('/api/get-videos', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ uid: uid })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            allAssignedVideos = result.assignedVideos;
+            localStorage.setItem("assignedVideos", JSON.stringify(allAssignedVideos));
+            
+            // UI Cleanup
+            document.getElementById("loadingMsg").classList.add("hidden");
+            
+            // Logic to determine where to send the user
+            if (allAssignedVideos.length > 0) {
+                // If they were on the "finished" screen, move them to the player
+                document.getElementById("finishedSection").classList.add("hidden");
+                document.getElementById("playerSection").classList.remove("hidden");
+                
+                document.getElementById("totalCount").innerText = allAssignedVideos.length;
+                // If they were finished (index >= length), reset index to 0
+                if (currentIndex >= allAssignedVideos.length) currentIndex = 0;
+                loadVideo(currentIndex);
+            } else {
+                // Keep them on the finished screen if still empty
+                document.getElementById("finishedSection").classList.remove("hidden");
+                document.getElementById("playerSection").classList.add("hidden");
+            }
+        }
+    } catch (err) {
+        alert("Sync failed: " + err.message);
+    }
 }
