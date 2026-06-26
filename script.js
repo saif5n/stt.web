@@ -178,24 +178,24 @@ function loadVideo(index) {
         if (!cleanUrl.endsWith('/')) { cleanUrl += '/'; }
         embedUrl = `${cleanUrl}embed`; 
     } else if (platform === "tiktok" || rawUrl.includes("tiktok.com")) {
-        const tiktokRegEx = /\/video\/(\d+)/;
-        const match = rawUrl.match(tiktokRegEx);
-        if (match && match[1]) {
-            embedUrl = `https://www.tiktok.com/embed/v2/${match[1]}`;
-            iframe.src = embedUrl;
-            iframe.style.display = "block";
-            document.getElementById("videoContainer").style.display = "block";
+        const tiktokId = getTikTokVideoId(rawUrl);
+        if (tiktokId) {
+            embedUrl = `https://www.tiktok.com/embed/v2/${tiktokId}?lang=en`;
         } else {
-            // Fallback for unsupported TikTok URLs: show the direct link only.
-            iframe.src = "";
-            iframe.style.display = "none";
-            document.getElementById("videoContainer").style.display = "none";
+            embedUrl = "";
         }
     } else {
         embedUrl = rawUrl; 
+    }
+
+    if (embedUrl) {
         iframe.src = embedUrl;
         iframe.style.display = "block";
         document.getElementById("videoContainer").style.display = "block";
+    } else {
+        iframe.src = "";
+        iframe.style.display = "none";
+        document.getElementById("videoContainer").style.display = "none";
     }
     
     document.getElementById("judgement").value = "";
@@ -204,6 +204,20 @@ function loadVideo(index) {
     // Reset skip area to collapsed state
     document.getElementById("skipReasonSection").classList.add("hidden");
     document.getElementById("skipReason").value = "";
+}
+
+function getTikTokVideoId(url) {
+    const shortUrlMatch = url.match(/t\.tiktok\.com\/[A-Za-z0-9]+/);
+    if (shortUrlMatch) {
+        return null; // Short URLs require server-side resolution.
+    }
+
+    const longMatch = url.match(/(?:\/video\/)(\d+)/);
+    if (longMatch && longMatch[1]) {
+        return longMatch[1];
+    }
+
+    return null;
 }
 
 function formatPlatformName(rawPlatform) {

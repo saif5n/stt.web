@@ -60,75 +60,72 @@ h2 {
 }
 
 /* ── Unified status bar ── */
-.details-panel {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(120px, 1fr));
+.top-info-modal {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
     gap: 12px;
-    background: #1e1e24;
-    border: 1px solid #2e2e38;
+    background: rgba(15, 23, 42, 0.98);
+    border: 1px solid rgba(148, 163, 184, 0.18);
     border-radius: 18px;
-    padding: 16px;
-    margin-bottom: 16px;
+    padding: 12px 14px;
+    margin-bottom: 18px;
+    box-shadow: 0 20px 50px rgba(15, 23, 42, 0.15);
 }
 
-.detail-block,
-.detail-refresh {
-    background: rgba(255,255,255,0.03);
-    border: 1px solid rgba(255,255,255,0.06);
-    border-radius: 16px;
-    padding: 14px 16px;
-}
-
-.detail-block {
+.top-info-meta {
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    justify-content: center;
-    min-height: 72px;
+    gap: 4px;
+    min-width: 120px;
 }
 
-.detail-label {
-    font-size: 0.75rem;
+.top-info-label {
+    font-size: 0.72rem;
     font-weight: 600;
-    color: var(--text-muted);
     text-transform: uppercase;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.12em;
+    color: var(--text-muted);
 }
 
-.detail-value {
-    display: flex;
-    align-items: baseline;
-    gap: 8px;
-    font-size: 1.5rem;
+.top-info-value,
+#etaDisplay {
+    font-size: 0.95rem;
     font-weight: 700;
     color: var(--text-main);
 }
 
-.detail-sep {
-    color: var(--border-color);
-    font-size: 1.1rem;
-}
-
-.detail-eta {
-    max-width: 100%;
-}
-
-.detail-refresh {
+.top-info-value {
     display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    min-height: 72px;
-    padding: 12px 16px;
+    align-items: baseline;
+    gap: 6px;
+}
+
+.top-refresh {
+    min-width: 130px;
+    padding: 10px 14px;
+    font-size: 0.88rem;
 }
 
 @media (max-width: 640px) {
-    .details-panel {
-        grid-template-columns: 1fr;
+    .top-info-modal {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 14px;
     }
 
-    .detail-refresh,
-    .detail-block {
+    .top-info-meta {
+        width: 100%;
+        min-width: auto;
+    }
+
+    .top-info-value,
+    #etaDisplay {
+        font-size: 1rem;
+    }
+
+    .top-refresh {
         width: 100%;
     }
 }
