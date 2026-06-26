@@ -33,7 +33,11 @@
 
 <div class="container">
         <div class="review-header-row">
-            <button id="prevVideoBtn" class="prev-video-btn hidden" type="button" onclick="goToPreviousVideo()" title="Previous video">← Previous</button>
+            <button id="prevVideoBtn" class="prev-video-btn hidden" type="button" onclick="goToPreviousVideo()" title="Previous video" aria-label="Previous video">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+            </button>
             <h2>Content Review</h2>
         </div>
 
