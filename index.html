@@ -45,22 +45,27 @@
 
     <div id="playerSection" class="hidden">
 
-        <!-- Unified status bar: progress + ETA + refresh in one row -->
-        <div class="status-bar">
-            <div class="status-bar-progress">
-                <span id="currentCount">0</span><span class="status-bar-sep">/</span><span id="totalCount">0</span>
-                <span class="status-bar-label">reviewed</span>
+        <!-- Details panel: reviewed count, ETA, refresh action -->
+        <div class="details-panel">
+            <div class="detail-block detail-review">
+                <span class="detail-label">Reviewed</span>
+                <div class="detail-value">
+                    <span id="currentCount">0</span>
+                    <span class="detail-sep">/</span>
+                    <span id="totalCount">0</span>
+                </div>
             </div>
-            <div class="status-bar-right">
-                <span id="etaDisplay" data-tooltip="The displayed time is an estimated completion time and may not be entirely accurate.">ETA: --</span>
-                <button id="refreshBtn" class="refresh-btn" onclick="fetchAssignedVideos(currentUid)" title="Check for new assignments">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="23 4 23 10 17 10"></polyline>
-                        <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
-                    </svg>
-                    Refresh
-                </button>
+            <div class="detail-block detail-eta">
+                <span class="detail-label">ETA</span>
+                <span id="etaDisplay" data-tooltip="The displayed time is an estimated completion time and may not be entirely accurate.">--</span>
             </div>
+            <button id="refreshBtn" class="refresh-btn detail-refresh" onclick="fetchAssignedVideos(currentUid)" title="Check for new assignments">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="23 4 23 10 17 10"></polyline>
+                    <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+                </svg>
+                Refresh
+            </button>
         </div>
 
         <div class="fallback-link-container">
@@ -69,8 +74,7 @@
         </div>
 
         <div class="video-container" id="videoContainer">
-            <iframe id="videoFrame" src="" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
-            <div id="tiktokEmbedContainer" class="hidden"></div>
+            <iframe id="videoFrame" src="" allowfullscreen referrerpolicy="strict-origin-when-cross-origin" allow="autoplay; encrypted-media; fullscreen"></iframe>
         </div>
 
         <div class="form-group">

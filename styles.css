@@ -60,47 +60,77 @@ h2 {
 }
 
 /* ── Unified status bar ── */
-.status-bar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+.details-panel {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(120px, 1fr));
+    gap: 12px;
     background: #1e1e24;
     border: 1px solid #2e2e38;
-    border-radius: 10px;
-    padding: 10px 16px;
+    border-radius: 18px;
+    padding: 16px;
     margin-bottom: 16px;
-    gap: 12px;
 }
 
-.status-bar-progress {
+.detail-block,
+.detail-refresh {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 16px;
+    padding: 14px 16px;
+}
+
+.detail-block {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    justify-content: center;
+    min-height: 72px;
+}
+
+.detail-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.detail-value {
     display: flex;
     align-items: baseline;
-    gap: 4px;
-    font-size: 1.05rem;
+    gap: 8px;
+    font-size: 1.5rem;
     font-weight: 700;
     color: var(--text-main);
-    letter-spacing: -0.01em;
 }
 
-.status-bar-sep {
+.detail-sep {
     color: var(--border-color);
-    font-weight: 400;
-    margin: 0 1px;
+    font-size: 1.1rem;
 }
 
-.status-bar-label {
-    font-size: 0.8rem;
-    font-weight: 500;
-    color: var(--text-muted);
-    margin-left: 6px;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
+.detail-eta {
+    max-width: 100%;
 }
 
-.status-bar-right {
-    display: flex;
+.detail-refresh {
+    display: inline-flex;
     align-items: center;
-    gap: 10px;
+    justify-content: center;
+    gap: 8px;
+    min-height: 72px;
+    padding: 12px 16px;
+}
+
+@media (max-width: 640px) {
+    .details-panel {
+        grid-template-columns: 1fr;
+    }
+
+    .detail-refresh,
+    .detail-block {
+        width: 100%;
+    }
 }
 
 /* ── ETA badge ── */
@@ -205,38 +235,8 @@ h2 {
         padding: 12px;
     }
 
-    .status-bar-progress,
-    .status-bar-right {
-        width: 100%;
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: space-between;
-        gap: 10px;
-    }
-
-    .status-bar-progress {
-        align-items: baseline;
-        justify-content: space-between;
-        gap: 8px;
-    }
-
-    .status-bar-progress .status-bar-label {
-        flex-basis: 100%;
-        margin-left: 0;
-        margin-top: 6px;
-    }
-
-    .status-bar-right {
-        flex-direction: column;
-        align-items: stretch;
-        margin-top: 8px;
-    }
-
-    .status-bar-right > * {
-        width: 100%;
-    }
-
-    .refresh-btn {
+    .refresh-btn,
+    .detail-refresh {
         width: 100%;
         padding: 10px 14px;
         white-space: normal;

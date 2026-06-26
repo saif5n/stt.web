@@ -181,19 +181,20 @@ function loadVideo(index) {
         const tiktokRegEx = /\/video\/(\d+)/;
         const match = rawUrl.match(tiktokRegEx);
         if (match && match[1]) {
-            renderTikTokEmbed(rawUrl, match[1]);
+            embedUrl = `https://www.tiktok.com/embed/v2/${match[1]}`;
+            iframe.src = embedUrl;
+            iframe.style.display = "block";
+            document.getElementById("videoContainer").style.display = "block";
         } else {
             // Fallback for unsupported TikTok URLs: show the direct link only.
             iframe.src = "";
             iframe.style.display = "none";
-            document.getElementById("tiktokEmbedContainer").classList.add("hidden");
             document.getElementById("videoContainer").style.display = "none";
         }
     } else {
         embedUrl = rawUrl; 
         iframe.src = embedUrl;
         iframe.style.display = "block";
-        document.getElementById("tiktokEmbedContainer").classList.add("hidden");
         document.getElementById("videoContainer").style.display = "block";
     }
     
@@ -203,41 +204,6 @@ function loadVideo(index) {
     // Reset skip area to collapsed state
     document.getElementById("skipReasonSection").classList.add("hidden");
     document.getElementById("skipReason").value = "";
-}
-
-function renderTikTokEmbed(rawUrl, videoId) {
-    const iframe = document.getElementById("videoFrame");
-    const embedContainer = document.getElementById("tiktokEmbedContainer");
-    const cleanedUrl = rawUrl.split('?')[0].replace(/\/share\/.*$/, '').replace(/\/embed\/.*$/, '').replace(/\/?$/, '');
-
-    iframe.src = "";
-    iframe.style.display = "none";
-    embedContainer.innerHTML = `
-        <blockquote class="tiktok-embed" cite="${cleanedUrl}" data-video-id="${videoId}" style="max-width: 100%; min-width: 325px; width: 100%;">
-            <section> </section>
-        </blockquote>
-    `;
-    embedContainer.classList.remove("hidden");
-    document.getElementById("videoContainer").style.display = "block";
-
-    ensureTikTokEmbedScript();
-}
-
-function ensureTikTokEmbedScript() {
-    const existing = document.querySelector('script[data-tiktok-embed-script]');
-    if (!existing) {
-        const script = document.createElement('script');
-        script.async = true;
-        script.src = 'https://www.tiktok.com/embed.js';
-        script.dataset.tiktokEmbedScript = 'true';
-        document.body.appendChild(script);
-    } else {
-        const reload = document.createElement('script');
-        reload.async = true;
-        reload.src = 'https://www.tiktok.com/embed.js';
-        reload.dataset.tiktokEmbedScript = 'true';
-        document.body.appendChild(reload);
-    }
 }
 
 function formatPlatformName(rawPlatform) {
