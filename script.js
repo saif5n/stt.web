@@ -146,14 +146,12 @@ function loadVideo(index) {
     document.getElementById("currentCount").innerText = index + 1;
     document.getElementById("totalCount").innerText = allAssignedVideos.length; 
 
-    // --- NEW ETA CALCULATION BLOCK ---
+    // ETA CALCULATION
     let totalRemainingSeconds = 0;
-    // Loop starts at the CURRENT index, so it only adds up unreviewed videos
     for (let i = index; i < allAssignedVideos.length; i++) {
         totalRemainingSeconds += parseDurationToSeconds(allAssignedVideos[i].duration);
     }
     document.getElementById("etaDisplay").innerText = `ETA: ${formatSecondsToETA(totalRemainingSeconds)}`;
-    // ---------------------------------
 
     const videoData = allAssignedVideos[index];
     const iframe = document.getElementById("videoFrame");
@@ -196,6 +194,8 @@ function loadVideo(index) {
     
     document.getElementById("judgement").value = "";
     document.getElementById("notes").value = "";
+
+    // Reset skip area to collapsed state
     document.getElementById("skipReasonSection").classList.add("hidden");
     document.getElementById("skipReason").value = "";
 }
@@ -220,12 +220,16 @@ async function submitResult() {
     executeSave(judgement, notes);
 }
 
-function skipResult() {
+// Toggles the skip reason panel open/closed
+function toggleSkip() {
     const skipSection = document.getElementById("skipReasonSection");
-    if (skipSection.classList.contains("hidden")) {
-        skipSection.classList.remove("hidden");
-        return;
+    skipSection.classList.toggle("hidden");
+    if (!skipSection.classList.contains("hidden")) {
+        document.getElementById("skipReason").value = "";
     }
+}
+
+function skipResult() {
     const reason = document.getElementById("skipReason").value;
     if (!reason) {
         alert("Please select a reason for skipping.");
@@ -238,19 +242,9 @@ async function executeSave(judgement, notes) {
     document.getElementById("playerSection").classList.add("hidden");
     const progressSection = document.getElementById("progressSection");
     
-    // Existing logic for videos left
+    // Videos remaining after this one
     const remaining = allAssignedVideos.length - (currentIndex + 1);
     document.getElementById("videosLeftText").innerText = `${remaining} video(s) remaining to review`;
-    
-    let remainingSeconds = 0;
-    // We start loop at currentIndex + 1 because we are moving to the next one
-    for (let i = currentIndex + 1; i < allAssignedVideos.length; i++) {
-        remainingSeconds += parseDurationToSeconds(allAssignedVideos[i].duration);
-    }
-    
-    // Update the UI element we added to HTML
-    document.getElementById("etaDuringSave").innerText = `Estimated remaining time: ${formatSecondsToETA(remainingSeconds)}`;
-    // ---------------------------------------------------------
 
     progressSection.classList.remove("hidden");
     
@@ -282,7 +276,7 @@ async function executeSave(judgement, notes) {
         }
     } catch (error) {
         alert("Transmission error. Check console.");
-        progressSection.classList.remove("hidden");
+        progressSection.classList.add("hidden");
         document.getElementById("playerSection").classList.remove("hidden");
     }
 }
@@ -305,8 +299,6 @@ function moveNext() {
 
             document.getElementById("playerSection").classList.add("hidden");
             document.getElementById("finishedSection").classList.remove("hidden");
-            
-            // Note: innerHTML += has been removed because it destroys internal button element event listeners
         }
     }, 300); 
 }
