@@ -350,10 +350,13 @@ iframe {
 
 .player-grid {
     display: block;
+    width: 100%;
 }
 
 .player-controls {
     width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
 }
 
 @media (min-width: 641px) {
@@ -364,20 +367,25 @@ iframe {
         align-items: start;
     }
 
+    .player-grid > * {
+        min-width: 0;
+    }
+
     .player-grid .video-container {
         margin: 0;
         align-self: start;
+        min-width: 0;
     }
 
     .player-controls {
         display: flex;
         flex-direction: column;
         gap: 20px;
-        background: rgba(15, 23, 42, 0.97);
+        background: rgba(15, 23, 42, 0.98);
         border: 1px solid rgba(148, 163, 184, 0.18);
         border-radius: 18px;
         padding: 24px;
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+        box-shadow: 0 24px 50px rgba(0, 0, 0, 0.18);
     }
 
     .player-controls .form-group,
