@@ -189,6 +189,7 @@ async function loadVideo(index) {
     if (directLink) {
         directLink.href = rawUrl || "#";
     }
+    prevButton.classList.remove("hidden");
     prevButton.disabled = index === 0;
 
     if (rawUrl.includes("youtu") || platform === "youtube") {
@@ -333,7 +334,7 @@ function renderTikTokEmbed(rawUrl, tiktokId) {
     const blockquote = document.createElement("blockquote");
     blockquote.className = "tiktok-embed";
     blockquote.setAttribute("cite", rawUrl);
-    blockquote.setAttribute("style", "max-width:605px;min-width:325px;width:100%;");
+    blockquote.setAttribute("style", "width:100%;max-width:605px;");
     if (tiktokId) {
         blockquote.setAttribute("data-video-id", tiktokId);
     }
