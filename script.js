@@ -154,7 +154,7 @@ function loadVideo(index) {
     }
     document.getElementById("etaDisplay").innerText = `ETA: ${formatSecondsToETA(totalRemainingSeconds)}`;
     // ---------------------------------
-    
+
     const videoData = allAssignedVideos[index];
     const iframe = document.getElementById("videoFrame");
     const directLink = document.getElementById("directOpenLink");
@@ -238,8 +238,20 @@ async function executeSave(judgement, notes) {
     document.getElementById("playerSection").classList.add("hidden");
     const progressSection = document.getElementById("progressSection");
     
+    // Existing logic for videos left
     const remaining = allAssignedVideos.length - (currentIndex + 1);
     document.getElementById("videosLeftText").innerText = `${remaining} video(s) remaining to review`;
+    
+    let remainingSeconds = 0;
+    // We start loop at currentIndex + 1 because we are moving to the next one
+    for (let i = currentIndex + 1; i < allAssignedVideos.length; i++) {
+        remainingSeconds += parseDurationToSeconds(allAssignedVideos[i].duration);
+    }
+    
+    // Update the UI element we added to HTML
+    document.getElementById("etaDuringSave").innerText = `Estimated remaining time: ${formatSecondsToETA(remainingSeconds)}`;
+    // ---------------------------------------------------------
+
     progressSection.classList.remove("hidden");
     
     const currentVideo = allAssignedVideos[currentIndex];
@@ -270,7 +282,7 @@ async function executeSave(judgement, notes) {
         }
     } catch (error) {
         alert("Transmission error. Check console.");
-        progressSection.classList.add("hidden");
+        progressSection.classList.remove("hidden");
         document.getElementById("playerSection").classList.remove("hidden");
     }
 }
