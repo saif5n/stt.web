@@ -18,16 +18,21 @@
         <p>Fetching your assigned content...</p>
     </div>
 
-    <div class="form-group hidden" id="loginSection">
-        <label for="uidInput">User ID</label>
-        <input type="text" id="uidInput" placeholder="Enter your 10-digit UID">
-        
-        <label for="passwordInput" style="margin-top: 16px;">Password</label>
-        <input type="password" id="passwordInput" placeholder="Enter your password">
-        
-        <button id="loginBtn" onclick="attemptLogin()" style="margin-top: 24px;">Login</button>
-        <p id="loginError" style="color: #ef4444; font-size: 0.9rem; text-align: center; margin-top: 12px;" class="hidden">Invalid UID or Password.</p>
-    </div>
+    <div class="input-group">
+    <label for="uidInput">
+        In-game UID
+        <span class="tooltip-icon" data-tooltip="The numeric user identification of your PUBG MOBILE account.">i</span>
+    </label>
+    <input type="text" id="uidInput" autocomplete="off" />
+</div>
+
+<div class="input-group">
+    <label for="passwordInput">
+        Password
+        <span class="tooltip-icon" data-tooltip="The 4-digit password that you have been provided by the Survey Team Discord app.">i</span>
+    </label>
+    <input type="password" id="passwordInput" autocomplete="off" />
+</div>
 
     <div id="playerSection" class="hidden">
         <div class="status-wrapper">

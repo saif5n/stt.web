@@ -300,3 +300,93 @@ button:disabled {
     font-size: 1.5rem;
     margin-bottom: 12px;
 }
+
+/* Container alignment */
+.input-group {
+    margin-bottom: 16px;
+    text-align: left; /* Adjust based on your overall layout */
+}
+
+.input-group label {
+    display: flex;
+    align-items: center;
+    gap: 8px; /* Space between the label text and the 'i' icon */
+    font-weight: bold;
+    margin-bottom: 6px;
+}
+
+/* The 'i' circular button */
+.tooltip-icon {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background-color: #555;
+    color: #fff;
+    font-size: 12px;
+    font-style: italic;
+    font-family: serif;
+    cursor: help;
+    position: relative;
+}
+
+/* The pop-up text box */
+.tooltip-icon::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 140%; /* Pushes the box above the icon */
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #222;
+    color: #fff;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-style: normal;
+    font-family: sans-serif;
+    font-weight: normal;
+    white-space: normal;
+    width: max-content;
+    max-width: 220px; /* Prevents long text from breaking the screen width */
+    text-align: center;
+    box-shadow: 0px 4px 6px rgba(0,0,0,0.2);
+    
+    /* Animation and visibility */
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    pointer-events: none; /* Prevents the tooltip from blocking clicks */
+    z-index: 100;
+}
+
+/* The little triangle arrow pointing down from the box */
+.tooltip-icon::before {
+    content: "";
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 6px;
+    border-style: solid;
+    border-color: #222 transparent transparent transparent;
+    
+    /* Animation and visibility */
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease;
+    z-index: 100;
+}
+
+/* Show tooltip on hover */
+.tooltip-icon:hover::after,
+.tooltip-icon:hover::before {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Slight slide-up effect on hover */
+.tooltip-icon:hover::after {
+    transform: translateX(-50%) translateY(-2px);
+}
