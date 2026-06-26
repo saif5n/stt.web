@@ -191,7 +191,7 @@ async function loadVideo(index) {
 
         const tiktokId = getTikTokVideoId(finalTikTokUrl);
         if (embedHtml) {
-            renderTikTokEmbedHtml(embedHtml);
+            renderTikTokEmbedHtml(embedHtml, finalTikTokUrl);
         } else {
             renderTikTokEmbed(finalTikTokUrl, tiktokId);
         }
@@ -230,6 +230,21 @@ function isTikTokShortUrl(url) {
     return /(vt|vm|t)\.tiktok\.com\/[A-Za-z0-9]+/.test(url);
 }
 
+async function getTikTokOEmbedHtml(rawUrl) {
+    try {
+        const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(`https://www.tiktok.com/oembed?url=${rawUrl}`)}`;
+        const response = await fetch(proxyUrl);
+        if (!response.ok) {
+            return null;
+        }
+        const data = await response.json();
+        return data.html || null;
+    } catch (error) {
+        console.warn('TikTok oEmbed resolution failed:', error);
+        return null;
+    }
+}
+
 async function resolveTikTokShortUrl(shortUrl) {
     const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(shortUrl)}`;
     try {
@@ -246,7 +261,7 @@ async function resolveTikTokShortUrl(shortUrl) {
             return canonicalMatch[1];
         }
 
-        const redirectMatch = html.match(/href=["'](https?:\\/\\/www\.tiktok\.com\\/[^"']+)["']/i);
+        const redirectMatch = html.match(/href=["'](https?:\/\/www\.tiktok\.com\/[^"']+)["']/i);
         if (redirectMatch && redirectMatch[1]) {
             return redirectMatch[1];
         }
@@ -271,6 +286,7 @@ function renderTikTokEmbed(rawUrl, tiktokId) {
     iframe.style.display = "none";
     iframe.src = "";
     wrapper.style.display = "flex";
+    wrapper.style.flexDirection = "column";
     wrapper.innerHTML = "";
 
     const blockquote = document.createElement("blockquote");
@@ -302,43 +318,30 @@ function renderTikTokEmbed(rawUrl, tiktokId) {
     script.async = true;
     wrapper.appendChild(script);
 
-    appendTikTokFallbackButton(wrapper, rawUrl);
-    document.getElementById("videoContainer").style.display = "block";
-}
-
-function renderTikTokFallback(rawUrl) {
-    const wrapper = document.getElementById("tiktokEmbedWrapper");
-    wrapper.style.display = "flex";
-    wrapper.innerHTML = "";
-
-    const message = document.createElement("div");
-    message.textContent = "TikTok video failed to embed. Open directly instead:";
-    message.style.color = "var(--text-muted)";
-    message.style.textAlign = "center";
-    message.style.marginBottom = "12px";
-    wrapper.appendChild(message);
-
-    appendTikTokFallbackButton(wrapper, rawUrl);
+    appendTikTokFallback(wrapper, rawUrl);
 
     document.getElementById("videoContainer").style.display = "block";
 }
 
-function appendTikTokFallbackButton(wrapper, rawUrl) {
-    const fallbackLink = document.createElement("a");
-    fallbackLink.href = rawUrl;
-    fallbackLink.target = "_blank";
-    fallbackLink.rel = "noreferrer noopener";
-    fallbackLink.className = "tiktok-fallback-button";
-    fallbackLink.innerHTML = `Open directly <span>↗</span>`;
-    wrapper.appendChild(fallbackLink);
+function appendTikTokFallback(wrapper, rawUrl) {
+    const fallback = document.createElement("div");
+    fallback.className = "tiktok-fallback";
+    const openLink = document.createElement("a");
+    openLink.href = rawUrl;
+    openLink.target = "_blank";
+    openLink.rel = "noreferrer noopener";
+    openLink.textContent = "Open directly on TikTok";
+    fallback.appendChild(openLink);
+    wrapper.appendChild(fallback);
 }
 
-function renderTikTokEmbedHtml(embedHtml) {
+function renderTikTokEmbedHtml(embedHtml, rawUrl) {
     const iframe = document.getElementById("videoFrame");
     const wrapper = document.getElementById("tiktokEmbedWrapper");
     iframe.style.display = "none";
     iframe.src = "";
-    wrapper.style.display = "block";
+    wrapper.style.display = "flex";
+    wrapper.style.flexDirection = "column";
     wrapper.innerHTML = embedHtml;
 
     const existing = document.getElementById("tiktokEmbedScript");
@@ -351,6 +354,8 @@ function renderTikTokEmbedHtml(embedHtml) {
     script.src = "https://www.tiktok.com/embed.js";
     script.async = true;
     wrapper.appendChild(script);
+
+    appendTikTokFallback(wrapper, rawUrl);
 
     document.getElementById("videoContainer").style.display = "block";
 }
