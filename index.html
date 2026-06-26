@@ -18,8 +18,7 @@
 
     <div id="loadingMsg" class="feedback-screen hidden">
         <div class="spinner"></div>
-        <h3>Loading</h3>
-        <p>Fetching your assigned content...</p>
+        <p class="feedback-label">Fetching your assigned content...</p>
     </div>
 
     <div id="loginSection">
@@ -45,23 +44,25 @@
     </div>
 
     <div id="playerSection" class="hidden">
-        <div class="counter-header">
-            <span id="etaDisplay" data-tooltip="The displayed time is an estimated completion time and may not be entirely accurate.">ETA: --</span>
-            <div class="status-text">
-                Reviewing <strong style="color: var(--text-main);"><span id="currentCount">0</span> of <span id="totalCount">0</span></strong>
+
+        <!-- Unified status bar: progress + ETA + refresh in one row -->
+        <div class="status-bar">
+            <div class="status-bar-progress">
+                <span id="currentCount">0</span><span class="status-bar-sep">/</span><span id="totalCount">0</span>
+                <span class="status-bar-label">reviewed</span>
+            </div>
+            <div class="status-bar-right">
+                <span id="etaDisplay" data-tooltip="The displayed time is an estimated completion time and may not be entirely accurate.">ETA: --</span>
+                <button id="refreshBtn" class="refresh-btn" onclick="fetchAssignedVideos(currentUid)" title="Check for new assignments">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="23 4 23 10 17 10"></polyline>
+                        <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+                    </svg>
+                    Refresh
+                </button>
             </div>
         </div>
 
-        <div class="status-wrapper" style="margin-top: 10px; border-top: none; padding-top: 0;">
-            <button id="refreshBtn" class="refresh-btn" onclick="fetchAssignedVideos(currentUid)" title="Check for new assignments">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="23 4 23 10 17 10"></polyline>
-                    <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
-                </svg>
-                Refresh
-            </button>
-        </div>
-        
         <div class="fallback-link-container">
             Platform: <span id="platformLabel" style="font-weight:600; color:var(--text-main);">Content</span>
             <a id="directOpenLink" href="#" target="_blank">Open directly ↗</a>
@@ -86,32 +87,42 @@
         </div>
 
         <button id="submitBtn" onclick="submitResult()">Submit (Enter)</button>
-        
-        <div class="form-group hidden" id="skipReasonSection">
-            <label for="skipReason">Reason for Skipping</label>
-            <select id="skipReason">
-                <option value="">Select a reason</option>
-                <option value="The video is not loading">The video is not loading</option>
-                <option value="The video is unavailable in my region">The video is unavailable in my region</option>
-            </select>
-        </div>
 
-        <button id="skipBtn" class="btn-secondary" onclick="skipResult()">Skip / Broken Link</button>
+        <!-- Skip is now clearly secondary, tucked below with its reason inline -->
+        <div class="skip-area">
+            <button id="skipBtn" class="btn-skip-toggle" onclick="toggleSkip()">Skip / Broken Link</button>
+            <div class="form-group hidden" id="skipReasonSection">
+                <label for="skipReason">Reason for Skipping</label>
+                <select id="skipReason">
+                    <option value="">Select a reason</option>
+                    <option value="The video is not loading">The video is not loading</option>
+                    <option value="The video is unavailable in my region">The video is unavailable in my region</option>
+                </select>
+                <button id="confirmSkipBtn" class="btn-secondary" style="margin-top:10px;" onclick="skipResult()">Confirm Skip</button>
+            </div>
+        </div>
     </div>
 
+    <!-- Saving progress screen — simplified to one animated line -->
     <div id="progressSection" class="feedback-screen hidden">
         <div class="spinner"></div>
-        <h3>Saving Submission</h3>
-        <p id="progressText">Logging reviews...</p>
+        <p class="feedback-label" id="progressText">Saving submission...</p>
         <p id="videosLeftText" class="videos-left"></p>
-        <p id="etaDuringSave" style="font-size: 0.9rem; color: #a1a1aa; margin-top: 5px;"></p>
     </div>
 
+    <!-- Completion screen — rewarding, with checkmark animation and stat -->
     <div id="finishedSection" class="feedback-screen hidden">
-        <h3>Reviewed</h3>
-        <p>There are no more pending videos assigned to you. Thank you for your participation!</p>
-        <button class="refresh-btn" onclick="fetchAssignedVideos(currentUid)" style="margin-top: 24px; padding: 12px 24px; font-size: 1rem;">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <div class="check-circle">
+            <svg class="check-svg" viewBox="0 0 52 52" xmlns="http://www.w3.org/2000/svg">
+                <circle class="check-circle-bg" cx="26" cy="26" r="24" fill="none"/>
+                <path class="check-tick" fill="none" d="M14 27l8 8 16-16"/>
+            </svg>
+        </div>
+        <h3 class="finish-title">All done!</h3>
+        <p class="finish-subtitle">No more pending content assigned to you.</p>
+        <p id="finishedStatLine" class="finish-stat"></p>
+        <button class="btn-check-new" onclick="fetchAssignedVideos(currentUid)">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                 <polyline points="23 4 23 10 17 10"></polyline>
                 <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
             </svg>
