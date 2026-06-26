@@ -181,7 +181,8 @@ function loadVideo(index) {
     } else if (platform === "tiktok" || rawUrl.includes("tiktok.com")) {
         const tiktokId = getTikTokVideoId(rawUrl);
         if (tiktokId) {
-            embedUrl = `https://www.tiktok.com/embed/v2/${tiktokId}?lang=en`;
+            renderTikTokEmbed(rawUrl, tiktokId);
+            embedUrl = "";
         } else {
             embedUrl = "";
         }
@@ -193,7 +194,7 @@ function loadVideo(index) {
         iframe.style.display = "block";
         iframe.src = embedUrl;
         document.getElementById("videoContainer").style.display = "block";
-    } else {
+    } else if (!rawUrl.includes("tiktok.com")) {
         iframe.src = "";
         iframe.style.display = "none";
         document.getElementById("videoContainer").style.display = "none";

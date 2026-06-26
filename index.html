@@ -14,9 +14,10 @@
         <span class="top-info-label">Reviewed</span>
         <span class="top-info-value"><span id="currentCount">0</span> / <span id="totalCount">0</span></span>
     </div>
-    <div class="top-info-meta">
+    <div class="top-info-meta top-info-eta">
         <span class="top-info-label">ETA</span>
-        <span id="etaDisplay" data-tooltip="The displayed time is an estimated completion time and may not be entirely accurate.">--</span>
+        <span id="etaDisplay">--</span>
+        <button class="info-icon" type="button" aria-label="ETA info" title="The displayed time is an estimated completion time and may not be entirely accurate.">i</button>
     </div>
     <button id="refreshBtn" class="refresh-btn top-refresh" onclick="fetchAssignedVideos(currentUid)" title="Check for new assignments">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">

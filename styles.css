@@ -113,11 +113,22 @@ h2 {
         flex-direction: column;
         align-items: stretch;
         padding: 14px;
+        width: 100%;
+        max-width: 340px;
+        margin: 0 auto 18px;
     }
 
     .top-info-meta {
-        width: 100%;
+        width: auto;
         min-width: auto;
+    }
+
+    .top-info-eta {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        width: 100%;
     }
 
     .top-info-value,
