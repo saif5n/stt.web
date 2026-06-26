@@ -12,27 +12,35 @@
 <div class="container">
     <h2>Content Review</h2>
 
-    <div id="loadingMsg" class="feedback-screen">
+    <div class="character-display" id="characterDisplay">
+        <img src="Character.png" alt="Survey Team Character">
+    </div>
+
+    <div id="loadingMsg" class="feedback-screen hidden">
         <div class="spinner"></div>
         <h3>Loading</h3>
         <p>Fetching your assigned content...</p>
     </div>
 
-    <div class="input-group">
-    <label for="uidInput">
-        In-game UID
-        <span class="tooltip-icon" data-tooltip="The numeric user identification of your PUBG MOBILE account.">i</span>
-    </label>
-    <input type="text" id="uidInput" autocomplete="off" />
-</div>
+    <div id="loginSection">
+        <div class="input-group">
+            <label for="uidInput">
+                In-game UID
+                <span class="tooltip-icon" data-tooltip="The numeric user identification of your PUBG MOBILE account.">i</span>
+            </label>
+            <input type="text" id="uidInput" autocomplete="off" />
+        </div>
 
-<div class="input-group">
-    <label for="passwordInput">
-        Password
-        <span class="tooltip-icon" data-tooltip="The 4-digit password that you have been provided by the Survey Team Discord app.">i</span>
-    </label>
-    <input type="password" id="passwordInput" autocomplete="off" />
-</div>
+        <div class="input-group">
+            <label for="passwordInput">
+                Password
+                <span class="tooltip-icon" data-tooltip="The 4-digit password that you have been provided by the Survey Team Discord app.">i</span>
+            </label>
+            <input type="password" id="passwordInput" autocomplete="off" />
+        </div>
+        
+        <button id="loginBtn" onclick="handleLogin()">Log In</button>
+    </div>
 
     <div id="playerSection" class="hidden">
         <div class="status-wrapper">
@@ -89,7 +97,8 @@
         <div class="spinner"></div>
         <h3>Saving Submission</h3>
         <p id="progressText">Logging reviews...</p>
-        <p id="videosLeftText" class="videos-left"></p> </div>
+        <p id="videosLeftText" class="videos-left"></p> 
+    </div>
 
     <div id="finishedSection" class="feedback-screen hidden">
         <h3>Reviewed</h3>

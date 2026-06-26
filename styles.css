@@ -45,7 +45,21 @@ h2 {
     letter-spacing: -0.025em;
 }
 
-/* Layout update for the status line + refresh button */
+/* Character Image display alignment */
+.character-display {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 24px;
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+.character-display img {
+    max-width: 160px;
+    height: auto;
+    filter: drop-shadow(0px 10px 15px rgba(0, 0, 0, 0.6)); 
+}
+
+/* Entry layout updates for status indicators */
 .status-wrapper {
     display: flex;
     justify-content: center;
@@ -65,7 +79,6 @@ h2 {
     margin: 0; 
 }
 
-/* New Refresh Button Styling */
 .refresh-btn {
     width: auto;
     margin-top: 0;
@@ -101,6 +114,11 @@ h2 {
     margin-bottom: 24px;
 }
 
+.input-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
 #skipReasonSection {
     margin-top: 24px;
 }
@@ -113,6 +131,14 @@ label {
     font-size: 0.9rem;
     text-transform: uppercase;
     letter-spacing: 0.05em;
+}
+
+.input-group label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    margin-bottom: 8px;
 }
 
 select, textarea, input[type="text"], input[type="password"] {
@@ -128,6 +154,10 @@ select, textarea, input[type="text"], input[type="password"] {
     transition: all 0.2s ease;
     cursor: pointer;
     box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+}
+
+input[type="text"], input[type="password"] {
+    cursor: text;
 }
 
 select {
@@ -152,6 +182,83 @@ textarea {
     resize: vertical;
     min-height: 90px;
     cursor: text;
+}
+
+/* Helpful Description Tooltips Styling */
+.tooltip-icon {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background-color: #3f3f46;
+    color: var(--text-muted);
+    font-size: 11px;
+    font-style: italic;
+    font-family: serif;
+    cursor: help;
+    position: relative;
+    transition: all 0.2s;
+}
+
+.tooltip-icon:hover {
+    background-color: var(--primary);
+    color: white;
+}
+
+.tooltip-icon::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 140%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #09090b;
+    border: 1px solid var(--border-color);
+    color: var(--text-main);
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-style: normal;
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    white-space: normal;
+    width: max-content;
+    max-width: 240px;
+    text-align: center;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    pointer-events: none;
+    z-index: 100;
+    text-transform: none;
+    letter-spacing: normal;
+}
+
+.tooltip-icon::before {
+    content: "";
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 6px;
+    border-style: solid;
+    border-color: var(--border-color) transparent transparent transparent;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease;
+    z-index: 100;
+}
+
+.tooltip-icon:hover::after,
+.tooltip-icon:hover::before {
+    opacity: 1;
+    visibility: visible;
+}
+
+.tooltip-icon:hover::after {
+    transform: translateX(-50%) translateY(-2px);
 }
 
 .fallback-link-container {
@@ -283,7 +390,6 @@ button:disabled {
     margin: 0;
 }
 
-/* Styling for the new Videos Left text */
 .videos-left {
     margin-top: 16px !important;
     font-weight: 600;
@@ -301,92 +407,7 @@ button:disabled {
     margin-bottom: 12px;
 }
 
-/* Container alignment */
-.input-group {
-    margin-bottom: 16px;
-    text-align: left; /* Adjust based on your overall layout */
-}
-
-.input-group label {
-    display: flex;
-    align-items: center;
-    gap: 8px; /* Space between the label text and the 'i' icon */
-    font-weight: bold;
-    margin-bottom: 6px;
-}
-
-/* The 'i' circular button */
-.tooltip-icon {
-    display: inline-flex;
-    justify-content: center;
-    align-items: center;
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    background-color: #555;
-    color: #fff;
-    font-size: 12px;
-    font-style: italic;
-    font-family: serif;
-    cursor: help;
-    position: relative;
-}
-
-/* The pop-up text box */
-.tooltip-icon::after {
-    content: attr(data-tooltip);
-    position: absolute;
-    bottom: 140%; /* Pushes the box above the icon */
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: #222;
-    color: #fff;
-    padding: 8px 12px;
-    border-radius: 6px;
-    font-size: 12px;
-    font-style: normal;
-    font-family: sans-serif;
-    font-weight: normal;
-    white-space: normal;
-    width: max-content;
-    max-width: 220px; /* Prevents long text from breaking the screen width */
-    text-align: center;
-    box-shadow: 0px 4px 6px rgba(0,0,0,0.2);
-    
-    /* Animation and visibility */
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.2s ease, transform 0.2s ease;
-    pointer-events: none; /* Prevents the tooltip from blocking clicks */
-    z-index: 100;
-}
-
-/* The little triangle arrow pointing down from the box */
-.tooltip-icon::before {
-    content: "";
-    position: absolute;
-    bottom: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    border-width: 6px;
-    border-style: solid;
-    border-color: #222 transparent transparent transparent;
-    
-    /* Animation and visibility */
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.2s ease;
-    z-index: 100;
-}
-
-/* Show tooltip on hover */
-.tooltip-icon:hover::after,
-.tooltip-icon:hover::before {
-    opacity: 1;
-    visibility: visible;
-}
-
-/* Slight slide-up effect on hover */
-.tooltip-icon:hover::after {
-    transform: translateX(-50%) translateY(-2px);
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
