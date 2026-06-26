@@ -89,6 +89,15 @@ h2 {
     letter-spacing: -0.025em;
 }
 
+/* Center the header only on the login screen */
+#loginSection + .container .review-header-row h2,
+/* Fallback: specifically target when loginSection is visible by giving a utility class via JS */
+.center-login-header h2 {
+    text-align: center;
+    width: 100%;
+    margin-left: 0;
+}
+
 /* ── Character ── */
 .character-display {
     display: flex;

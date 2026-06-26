@@ -76,6 +76,24 @@ function initializeApplication() {
     document.getElementById("loadingMsg").classList.add("hidden");
 }
 
+// Center the Content Review header only when the login view is visible
+function updateHeaderAlignment() {
+    const loginVisible = !document.getElementById('loginSection').classList.contains('hidden');
+    const headerRow = document.querySelector('.review-header-row');
+    if (!headerRow) return;
+    if (loginVisible) {
+        headerRow.classList.add('center-login-header');
+    } else {
+        headerRow.classList.remove('center-login-header');
+    }
+}
+
+// Run on load and whenever we toggle login visibility
+window.addEventListener('DOMContentLoaded', updateHeaderAlignment);
+const observer = new MutationObserver(updateHeaderAlignment);
+const loginSection = document.getElementById('loginSection');
+if (loginSection) observer.observe(loginSection, { attributes: true, attributeFilter: ['class'] });
+
 async function attemptLogin() {
     const uid = document.getElementById("uidInput").value.trim();
     const password = document.getElementById("passwordInput").value.trim();
@@ -135,6 +153,9 @@ async function attemptLogin() {
                 // Instantly wipe memory so refreshing this empty state triggers a login fallback
                 localStorage.clear();
                 document.getElementById("finishedSection").classList.remove("hidden");
+                // Hide top info/ETA when showing the finished screen
+                const topInfoEl = document.getElementById('topInfo');
+                if (topInfoEl) topInfoEl.classList.add('hidden');
             }
         } else {
             // 3. If login fails, bring the character and form back
@@ -170,6 +191,13 @@ async function attemptLogin() {
 }
 
 async function loadVideo(index) {
+    // If we're coming from the finished screen, ensure it's hidden and player shown
+    const finishedSection = document.getElementById('finishedSection');
+    if (finishedSection && !finishedSection.classList.contains('hidden')) {
+        finishedSection.classList.add('hidden');
+        const playerSection = document.getElementById('playerSection');
+        if (playerSection) playerSection.classList.remove('hidden');
+    }
     document.getElementById("currentCount").innerText = index + 1;
     document.getElementById("totalCount").innerText = allAssignedVideos.length; 
 
@@ -507,11 +535,19 @@ function moveNext() {
             loadVideo(currentIndex);
         } else {
             // FINISHED ALL VIDEOS
-            // Clear local cache completely so page refresh causes automatic logout
-            localStorage.clear();
+            // Keep session so user can navigate back; set index to end marker
+            currentIndex = allAssignedVideos.length;
+            localStorage.setItem("currentIndex", currentIndex);
 
             document.getElementById("playerSection").classList.add("hidden");
             document.getElementById("finishedSection").classList.remove("hidden");
+            // Hide top info/ETA when showing finished screen
+            const topInfoFinished = document.getElementById('topInfo');
+            if (topInfoFinished) topInfoFinished.classList.add('hidden');
+
+            // Ensure Previous is enabled when there are items
+            const prevBtn = document.getElementById('prevVideoBtn');
+            if (prevBtn) prevBtn.disabled = allAssignedVideos.length === 0;
         }
     }, 300); 
 }
@@ -566,6 +602,9 @@ async function fetchAssignedVideos(uid, showLoading = true) {
                 localStorage.clear();
                 document.getElementById("finishedSection").classList.remove("hidden");
                 document.getElementById("playerSection").classList.add("hidden");
+                // Hide top info/ETA when showing finished screen
+                const topInfo = document.getElementById('topInfo');
+                if (topInfo) topInfo.classList.add('hidden');
                 alert("No new items assigned yet.");
             }
         }
