@@ -70,7 +70,10 @@ h2 {
     border: 1px solid rgba(148, 163, 184, 0.18);
     border-radius: 18px;
     padding: 12px 14px;
-    margin-bottom: 18px;
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto 18px;
+    box-sizing: border-box;
     box-shadow: 0 20px 50px rgba(15, 23, 42, 0.15);
 }
 
