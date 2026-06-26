@@ -180,12 +180,8 @@ function loadVideo(index) {
         embedUrl = `${cleanUrl}embed`; 
     } else if (platform === "tiktok" || rawUrl.includes("tiktok.com")) {
         const tiktokId = getTikTokVideoId(rawUrl);
-        if (tiktokId) {
-            renderTikTokEmbed(rawUrl, tiktokId);
-            embedUrl = "";
-        } else {
-            embedUrl = "";
-        }
+        renderTikTokEmbed(rawUrl, tiktokId);
+        embedUrl = "";
     } else {
         embedUrl = rawUrl; 
     }
@@ -193,11 +189,10 @@ function loadVideo(index) {
     if (embedUrl) {
         iframe.style.display = "block";
         iframe.src = embedUrl;
+        document.getElementById("tiktokEmbedWrapper").style.display = "none";
         document.getElementById("videoContainer").style.display = "block";
     } else if (!rawUrl.includes("tiktok.com")) {
-        iframe.src = "";
-        iframe.style.display = "none";
-        document.getElementById("videoContainer").style.display = "none";
+        hideVideoFrames();
     }
     
     document.getElementById("judgement").value = "";
@@ -220,6 +215,55 @@ function getTikTokVideoId(url) {
     }
 
     return null;
+}
+
+function hideVideoFrames() {
+    const iframe = document.getElementById("videoFrame");
+    const tiktokWrapper = document.getElementById("tiktokEmbedWrapper");
+    iframe.src = "";
+    iframe.style.display = "none";
+    tiktokWrapper.style.display = "none";
+    document.getElementById("videoContainer").style.display = "none";
+}
+
+function renderTikTokEmbed(rawUrl, tiktokId) {
+    const iframe = document.getElementById("videoFrame");
+    const wrapper = document.getElementById("tiktokEmbedWrapper");
+    iframe.style.display = "none";
+    iframe.src = "";
+    wrapper.style.display = "flex";
+    wrapper.innerHTML = "";
+
+    const blockquote = document.createElement("blockquote");
+    blockquote.className = "tiktok-embed";
+    blockquote.setAttribute("cite", rawUrl);
+    blockquote.setAttribute("style", "width:100%;min-height:320px;max-width:100%;");
+    if (tiktokId) {
+        blockquote.setAttribute("data-video-id", tiktokId);
+    }
+
+    const section = document.createElement("section");
+    const anchor = document.createElement("a");
+    anchor.setAttribute("target", "_blank");
+    anchor.setAttribute("rel", "noreferrer noopener");
+    anchor.setAttribute("href", rawUrl);
+    anchor.textContent = "View on TikTok";
+    section.appendChild(anchor);
+    blockquote.appendChild(section);
+    wrapper.appendChild(blockquote);
+
+    const existing = document.getElementById("tiktokEmbedScript");
+    if (existing) {
+        existing.remove();
+    }
+
+    const script = document.createElement("script");
+    script.id = "tiktokEmbedScript";
+    script.src = "https://www.tiktok.com/embed.js";
+    script.async = true;
+    wrapper.appendChild(script);
+
+    document.getElementById("videoContainer").style.display = "block";
 }
 
 function formatPlatformName(rawPlatform) {
