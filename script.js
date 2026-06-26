@@ -143,7 +143,10 @@ async function attemptLogin() {
 }
 
 function loadVideo(index) {
+    // UPDATED: This ensures the top bar (e.g., "Reviewing 2 of 966") updates immediately
     document.getElementById("currentCount").innerText = index + 1;
+    document.getElementById("totalCount").innerText = allAssignedVideos.length; // Safeguard line
+
     const videoData = allAssignedVideos[index];
     const iframe = document.getElementById("videoFrame");
     const directLink = document.getElementById("directOpenLink");
