@@ -1,8 +1,8 @@
-// Removed APPS_SCRIPT_URL. Vercel automatically routes relative '/api/...' paths.
-
+// Global Session Variables
 let allAssignedVideos = []; 
 let currentIndex = 0;
 let currentUser = "";
+let currentUid = ""; // Tracks the 10-digit database look-up key
 
 window.addEventListener('DOMContentLoaded', initializeApplication);
 
@@ -11,7 +11,6 @@ document.addEventListener('keydown', function(event) {
     if (event.key === 'Enter' && !document.getElementById('playerSection').classList.contains('hidden')) {
         submitResult();
     }
-    // Allow hitting Enter to login
     if (event.key === 'Enter' && !document.getElementById('loginSection').classList.contains('hidden')) {
         attemptLogin();
     }
@@ -19,27 +18,30 @@ document.addEventListener('keydown', function(event) {
 
 function initializeApplication() {
     const savedUser = localStorage.getItem("currentUser");
+    const savedUid = localStorage.getItem("currentUid");
     const savedVideos = localStorage.getItem("assignedVideos");
-    const savedIndex = localStorage.getItem("currentIndex"); // Get the index
+    const savedIndex = localStorage.getItem("currentIndex"); 
 
-    if (savedUser && savedVideos) {
+    if (savedUser && savedVideos && savedUid) {
         currentUser = savedUser;
+        currentUid = savedUid;
         allAssignedVideos = JSON.parse(savedVideos);
-        
-        // RESTORE THE INDEX
-        // Use parseInt because localStorage stores everything as a string
         currentIndex = savedIndex ? parseInt(savedIndex) : 0; 
 
-        document.getElementById("loginSection").classList.add("hidden");
-        
-        if (currentIndex < allAssignedVideos.length) {
+        // AUTO-LOGOUT GATEKEEPER:
+        // If they refresh while on the finished screen or have no assignments, log out immediately
+        if (currentIndex >= allAssignedVideos.length || allAssignedVideos.length === 0) {
+            localStorage.clear();
+            document.getElementById("loginSection").classList.remove("hidden");
+            document.getElementById("finishedSection").classList.add("hidden");
+        } else {
+            document.getElementById("loginSection").classList.add("hidden");
             document.getElementById("playerSection").classList.remove("hidden");
             document.getElementById("totalCount").innerText = allAssignedVideos.length;
             loadVideo(currentIndex);
-        } else {
-            document.getElementById("finishedSection").classList.remove("hidden");
         }
     } else {
+        localStorage.clear();
         document.getElementById("loginSection").classList.remove("hidden");
     }
     
@@ -58,63 +60,55 @@ async function attemptLogin() {
         return;
     }
 
-    // UI Updates during fetch
     loginBtn.innerText = "Verifying...";
     loginBtn.disabled = true;
     loginError.classList.add("hidden");
 
     try {
-        // UPDATED: Now points to the Vercel serverless login function
         const response = await fetch('/api/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            // Sending credentials in the body of a POST request is much more secure
             body: JSON.stringify({ uid: uid, password: password })
         });
         
         const result = await response.json();
 
-if (response.ok && result.success) {
-    currentUser = result.username;
-    allAssignedVideos = result.assignedVideos;
+        if (response.ok && result.success) {
+            currentUser = result.username;
+            currentUid = uid; // Save the 10-digit ID used to log in
+            allAssignedVideos = result.assignedVideos;
+            currentIndex = 0;
 
-    // Save session data to localStorage
-    localStorage.setItem("currentUser", currentUser);
-    localStorage.setItem("assignedVideos", JSON.stringify(allAssignedVideos));
+            document.getElementById("loginSection").classList.add("hidden");
+            
+            if (allAssignedVideos.length > 0) {
+                // Save complete active session properties
+                localStorage.setItem("currentUser", currentUser);
+                localStorage.setItem("currentUid", currentUid);
+                localStorage.setItem("assignedVideos", JSON.stringify(allAssignedVideos));
+                localStorage.setItem("currentIndex", currentIndex);
 
-    document.getElementById("loginSection").classList.add("hidden");
-    
-    if (allAssignedVideos.length > 0) {
-        document.getElementById("playerSection").classList.remove("hidden");
-        document.getElementById("totalCount").innerText = allAssignedVideos.length;
-        loadVideo(currentIndex);
-    } else {
-        document.getElementById("finishedSection").classList.remove("hidden");
-    }
-} else {
-    // Login failed
-    loginError.innerText = result.message || "Invalid UID or Password.";
-    loginError.classList.remove("hidden");
-    loginBtn.innerText = "Login";
-    loginBtn.disabled = false;
-}
+                document.getElementById("playerSection").classList.remove("hidden");
+                document.getElementById("totalCount").innerText = allAssignedVideos.length;
+                loadVideo(currentIndex);
+            } else {
+                // Instantly wipe memory so refreshing this empty state triggers a login fallback
+                localStorage.clear();
+                document.getElementById("finishedSection").classList.remove("hidden");
+            }
+        } else {
+            loginError.innerText = result.message || "Invalid UID or Password.";
+            loginError.classList.remove("hidden");
+            loginBtn.innerText = "Login";
+            loginBtn.disabled = false;
+        }
     } catch (error) {
-    console.error("Login error details:", error);
-    // This will now show the actual error on the screen
-    loginError.innerText = "Error: " + error.message; 
-    loginError.classList.remove("hidden");
-    loginBtn.innerText = "Login";
-    loginBtn.disabled = false;
-}
-}
-
-function formatPlatformName(rawPlatform) {
-    const p = (rawPlatform || "").toLowerCase().trim();
-    if (p === "youtube") return "YouTube";
-    if (p === "tiktok") return "TikTok";
-    if (p === "instagram") return "Instagram";
-    if (p === "twitter" || p === "x") return "X (Twitter)";
-    return p ? (p.charAt(0).toUpperCase() + p.slice(1)) : "Unknown Platform";
+        console.error("Login error details:", error);
+        loginError.innerText = "Error: " + error.message; 
+        loginError.classList.remove("hidden");
+        loginBtn.innerText = "Login";
+        loginBtn.disabled = false;
+    }
 }
 
 function loadVideo(index) {
@@ -131,7 +125,6 @@ function loadVideo(index) {
     platformLabel.textContent = formatPlatformName(platform);
     directLink.href = rawUrl;
 
-    // Platform logic remains identical
     if (rawUrl.includes("youtu") || platform === "youtube") {
         const ytRegEx = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=|\/shorts\/)([^#\&\?]*).*/;
         const match = rawUrl.match(ytRegEx);
@@ -165,6 +158,15 @@ function loadVideo(index) {
     document.getElementById("skipReason").value = "";
 }
 
+function formatPlatformName(rawPlatform) {
+    const p = (rawPlatform || "").toLowerCase().trim();
+    if (p === "youtube") return "YouTube";
+    if (p === "tiktok") return "TikTok";
+    if (p === "instagram") return "Instagram";
+    if (p === "twitter" || p === "x") return "X (Twitter)";
+    return p ? (p.charAt(0).toUpperCase() + p.slice(1)) : "Unknown Platform";
+}
+
 async function submitResult() {
     const judgement = document.getElementById("judgement").value;
     const notes = document.getElementById("notes").value;
@@ -173,39 +175,33 @@ async function submitResult() {
         alert("Please select a judgement outcome before proceeding.");
         return;
     }
-
     executeSave(judgement, notes);
 }
 
 function skipResult() {
     const skipSection = document.getElementById("skipReasonSection");
-
     if (skipSection.classList.contains("hidden")) {
         skipSection.classList.remove("hidden");
         return;
     }
-
     const reason = document.getElementById("skipReason").value;
-
     if (!reason) {
         alert("Please select a reason for skipping.");
         return;
     }
-
     executeSave("Skipped", reason);
 }
 
 async function executeSave(judgement, notes) {
     document.getElementById("playerSection").classList.add("hidden");
     const progressSection = document.getElementById("progressSection");
-    // Calculate videos remaining after this submission
+    
     const remaining = allAssignedVideos.length - (currentIndex + 1);
     document.getElementById("videosLeftText").innerText = `${remaining} video(s) remaining to review`;
     progressSection.classList.remove("hidden");
     
     const currentVideo = allAssignedVideos[currentIndex];
     
-    // We must send EVERYTHING the API needs to log the row and update the status
     const payload = {
         rowId: currentVideo.id,
         username: currentUser,
@@ -239,73 +235,81 @@ async function executeSave(judgement, notes) {
 
 function moveNext() {
     currentIndex++;
-    
-    // Save current progress in case they refresh before finishing
     localStorage.setItem("currentIndex", currentIndex);
-
     const progressSection = document.getElementById("progressSection");
     
     setTimeout(() => {
         progressSection.classList.add("hidden");
         
         if (currentIndex < allAssignedVideos.length) {
-            // Still have videos, keep playing
             document.getElementById("playerSection").classList.remove("hidden");
             loadVideo(currentIndex);
         } else {
             // FINISHED ALL VIDEOS
-            // 1. Force Logout: Clear all session data
-            localStorage.removeItem("currentUser");
-            localStorage.removeItem("assignedVideos");
-            localStorage.removeItem("currentIndex");
+            // Clear local cache completely so page refresh causes automatic logout
+            localStorage.clear();
 
-            // 2. Update UI
             document.getElementById("playerSection").classList.add("hidden");
             document.getElementById("finishedSection").classList.remove("hidden");
             
-            // Optional: Provide instructions
-            document.getElementById("finishedSection").innerHTML += 
-                "<p>Session expired. Please <a href='javascript:location.reload()'>click here</a> to log in for new assignments.</p>";
+            // Note: innerHTML += has been removed because it destroys internal button element event listeners
         }
     }, 300); 
 }
 
 async function fetchAssignedVideos(uid, showLoading = true) {
-    if (showLoading) document.getElementById("loadingMsg").innerText = "Syncing...";
+    // If cache was wiped, check our active runtime variable fallback
+    const lookupUid = uid || currentUid;
+    
+    if (!lookupUid) {
+        alert("Session context missing. Refreshing to return to login screen.");
+        localStorage.clear();
+        location.reload();
+        return;
+    }
+
+    if (showLoading) {
+        document.getElementById("loadingMsg").innerHTML = `<div class="spinner"></div><h3>Syncing</h3><p>Checking database entries...</p>`;
+        document.getElementById("loadingMsg").classList.remove("hidden");
+    }
     
     try {
         const response = await fetch('/api/get-videos', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ uid: uid })
+            body: JSON.stringify({ uid: lookupUid })
         });
         
         const result = await response.json();
         
         if (result.success) {
             allAssignedVideos = result.assignedVideos;
-            localStorage.setItem("assignedVideos", JSON.stringify(allAssignedVideos));
-            
-            // UI Cleanup
             document.getElementById("loadingMsg").classList.add("hidden");
             
-            // Logic to determine where to send the user
             if (allAssignedVideos.length > 0) {
-                // If they were on the "finished" screen, move them to the player
+                // Re-establish session values to protect against page refreshes
+                localStorage.setItem("currentUser", currentUser);
+                localStorage.setItem("currentUid", currentUid);
+                localStorage.setItem("assignedVideos", JSON.stringify(allAssignedVideos));
+                
+                currentIndex = 0;
+                localStorage.setItem("currentIndex", currentIndex);
+
                 document.getElementById("finishedSection").classList.add("hidden");
                 document.getElementById("playerSection").classList.remove("hidden");
-                
                 document.getElementById("totalCount").innerText = allAssignedVideos.length;
-                // If they were finished (index >= length), reset index to 0
-                if (currentIndex >= allAssignedVideos.length) currentIndex = 0;
                 loadVideo(currentIndex);
+                alert(`Sync complete! Loaded ${allAssignedVideos.length} new video(s).`);
             } else {
-                // Keep them on the finished screen if still empty
+                // Keep things locked out if array remains empty
+                localStorage.clear();
                 document.getElementById("finishedSection").classList.remove("hidden");
                 document.getElementById("playerSection").classList.add("hidden");
+                alert("No new items assigned yet.");
             }
         }
     } catch (err) {
         alert("Sync failed: " + err.message);
+        document.getElementById("loadingMsg").classList.add("hidden");
     }
 }

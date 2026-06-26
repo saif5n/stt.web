@@ -34,7 +34,7 @@
             <div class="status-text">
                 Reviewing <strong style="color: var(--text-main);"><span id="currentCount">0</span> of <span id="totalCount">0</span></strong>
             </div>
-            <button id="refreshBtn" class="refresh-btn" onclick="fetchAssignedVideos(currentUser)" title="Check for new assignments">
+            <button id="refreshBtn" class="refresh-btn" onclick="fetchAssignedVideos(currentUid)" title="Check for new assignments">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <polyline points="23 4 23 10 17 10"></polyline>
                     <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
@@ -89,7 +89,7 @@
     <div id="finishedSection" class="feedback-screen hidden">
         <h3>Reviewed</h3>
         <p>There are no more pending videos assigned to you. Thank you for your participation!</p>
-        <button class="refresh-btn" onclick="fetchAssignedVideos(currentUser)" style="margin-top: 24px; padding: 12px 24px; font-size: 1rem;">
+        <button class="refresh-btn" onclick="fetchAssignedVideos(currentUid)" style="margin-top: 24px; padding: 12px 24px; font-size: 1rem;">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <polyline points="23 4 23 10 17 10"></polyline>
                 <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
