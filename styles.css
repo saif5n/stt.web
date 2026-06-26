@@ -348,6 +348,37 @@ iframe {
     display: block;
 }
 
+.player-grid {
+    display: block;
+}
+
+.player-controls {
+    width: 100%;
+}
+
+@media (min-width: 641px) {
+    .player-grid {
+        display: grid;
+        grid-template-columns: minmax(320px, 1.8fr) minmax(260px, 1fr);
+        gap: 24px;
+        align-items: start;
+    }
+
+    .player-controls {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .player-grid .video-container {
+        margin: 0;
+    }
+
+    .fallback-link-container {
+        margin-bottom: 24px;
+    }
+}
+
 /* ── Form ── */
 .form-group {
     margin-bottom: 20px;
