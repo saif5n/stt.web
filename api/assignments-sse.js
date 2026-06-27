@@ -1,5 +1,18 @@
 const { google } = require('googleapis');
 
+// Simple in-memory cache
+const _cache = {};
+function getCached(key, ttlMs, fetchFn) {
+  const now = Date.now();
+  if (_cache[key] && now - _cache[key].ts < ttlMs) {
+    return Promise.resolve(_cache[key].value);
+  }
+  return fetchFn().then(value => {
+    _cache[key] = { value, ts: now };
+    return value;
+  });
+}
+
 module.exports = async function handler(req, res) {
   if (req.method !== 'GET') return res.status(405).json({ message: 'Method Not Allowed' });
 
@@ -15,14 +28,11 @@ module.exports = async function handler(req, res) {
 
   const sheets = google.sheets({ version: 'v4', auth });
 
-  // SSE headers
   res.writeHead(200, {
     'Content-Type': 'text/event-stream',
     'Cache-Control': 'no-cache',
     Connection: 'keep-alive',
   });
-
-  // Keep the connection alive by sending a comment
   res.write(': connected\n\n');
 
   let stopped = false;
@@ -33,24 +43,27 @@ module.exports = async function handler(req, res) {
     try { res.end(); } catch (e) {}
   });
 
-  const cache = require('./sheets-cache');
-
   async function fetchAssignedForUid() {
-    // Use cached UIDs and URLs to reduce read traffic
-    const users = await (async () => {
-      const ids = await cache.batchGetCached(sheets, spreadsheetId, ['UIDs!A2:B'], 5 * 60 * 1000);
-      return ids.data.valueRanges?.[0]?.values || [];
-    })();
+    const users = await getCached('uids', 5 * 60 * 1000, async () => {
+      const resp = await sheets.spreadsheets.values.get({
+        spreadsheetId,
+        range: 'UIDs!A2:B',
+      });
+      return resp.data.values || [];
+    });
 
     const userRow = users.find(row => String(row[1]).trim() === String(uid).trim());
-    if (!userRow) {
-      return { error: 'UID not found' };
-    }
+    if (!userRow) return { error: 'UID not found' };
 
     const userName = userRow[0];
 
-    const urlsRange = await cache.batchGetCached(sheets, spreadsheetId, ['URLs!A2:E'], 30 * 1000);
-    const rows = urlsRange.data.valueRanges?.[0]?.values || [];
+    const rows = await getCached('urls', 30 * 1000, async () => {
+      const resp = await sheets.spreadsheets.values.get({
+        spreadsheetId,
+        range: 'URLs!A2:E',
+      });
+      return resp.data.values || [];
+    });
 
     const assignedVideos = rows
       .map((row, index) => ({
@@ -59,14 +72,13 @@ module.exports = async function handler(req, res) {
         url: row[1],
         duration: row[2] || '',
         platform: row[3] || '',
-        status: row[4] || ''
+        status: row[4] || '',
       }))
       .filter(r => r.assignedTo === userName && r.status !== 'Reviewed' && r.status !== 'Skipped');
 
     return { assignedVideos };
   }
 
-  // Send initial payload then poll
   try {
     const initial = await fetchAssignedForUid();
     if (initial.error) {
@@ -87,7 +99,6 @@ module.exports = async function handler(req, res) {
         res.write(`event: error\ndata: ${JSON.stringify({ message: result.error })}\n\n`);
         return;
       }
-
       const payload = JSON.stringify(result.assignedVideos || []);
       if (payload !== lastPayload) {
         lastPayload = payload;
