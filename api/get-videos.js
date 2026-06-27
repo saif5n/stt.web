@@ -18,7 +18,7 @@ module.exports = async function handler(req, res) {
     // STEP 1: Look up the Name associated with this UID
     const uidResponse = await sheets.spreadsheets.values.get({
       spreadsheetId,
-      range: 'UIDs!A2:B', 
+      range: 'Credentials!A2:B', 
     });
 
     const users = uidResponse.data.values || [];

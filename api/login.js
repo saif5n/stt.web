@@ -24,7 +24,7 @@ module.exports = async function handler(req, res) {
 
   try {
     // 1. Fetch UIDs to identify the user name
-    const uidsResponse = await sheets.spreadsheets.values.get({ spreadsheetId, range: 'UIDs!A:C' });
+    const uidsResponse = await sheets.spreadsheets.values.get({ spreadsheetId, range: 'Credentials!A:C' });
     const users = uidsResponse.data.values || [];
     
     // Added .trim() to ensure accidental whitespace doesn't break logins
