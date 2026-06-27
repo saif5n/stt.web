@@ -56,7 +56,6 @@ function startAssignedSSE() {
 
         assignmentEventSource.onerror = (err) => {
             console.error('SSE connection error', err);
-            // Attempt reconnect after a short delay
             stopAssignedSSE();
             setTimeout(() => {
                 startAssignedSSE();
@@ -78,11 +77,10 @@ function stopAssignedSSE() {
 
 function shouldApplyAssignmentUpdate(newAssigned) {
     if (!Array.isArray(newAssigned)) return false;
-    const currentCount = allAssignedVideos.length;
-    const incomingCount = newAssigned.length;
-    if (incomingCount === 0) return false;
-    if (currentCount === 0 && incomingCount > 0) return true;
-    return incomingCount > currentCount;
+    // Always apply on refresh (allAssignedVideos starts empty)
+    if (allAssignedVideos.length === 0 && newAssigned.length >= 0) return true;
+    return newAssigned.length !== allAssignedVideos.length ||
+        JSON.stringify(newAssigned) !== JSON.stringify(allAssignedVideos);
 }
 
 function handleAssignedUpdate(newAssigned) {
@@ -93,7 +91,6 @@ function handleAssignedUpdate(newAssigned) {
     if (prev === incoming) return; // no change
 
     const previousCount = allAssignedVideos.length;
-    const incomingCount = (newAssigned || []).length;
     const hadActiveItems = previousCount > 0 && currentIndex < previousCount;
 
     allAssignedVideos = newAssigned || [];
@@ -102,6 +99,9 @@ function handleAssignedUpdate(newAssigned) {
     localStorage.setItem("currentUid", currentUid);
     localStorage.setItem("assignedVideos", JSON.stringify(allAssignedVideos));
     localStorage.setItem("videoDrafts", JSON.stringify(videoDrafts));
+
+    // Hide spinner now that we have real data
+    document.getElementById("loadingMsg").classList.add("hidden");
 
     document.getElementById("totalCount").innerText = allAssignedVideos.length;
 
@@ -142,8 +142,6 @@ function initializeApplication() {
     const previewMode = urlParams.get("preview") === "true";
     const savedUser = localStorage.getItem("currentUser");
     const savedUid = localStorage.getItem("currentUid");
-    const savedVideos = localStorage.getItem("assignedVideos");
-    const savedIndex = localStorage.getItem("currentIndex"); 
 
     if (previewMode) {
         currentUser = "Preview";
@@ -168,38 +166,33 @@ function initializeApplication() {
         document.getElementById("totalCount").innerText = allAssignedVideos.length;
         loadVideo(currentIndex);
         return;
+
     } else if (savedUser && savedUid) {
-    // Restore identity only, not stale video data
-    currentUser = savedUser;
-    currentUid = savedUid;
-    currentIndex = 0;
-    allAssignedVideos = [];
-    videoDrafts = {};
+        // Restore identity only — discard stale video data and let SSE provide fresh state
+        currentUser = savedUser;
+        currentUid = savedUid;
+        currentIndex = 0;
+        allAssignedVideos = [];
+        videoDrafts = {};
 
-    document.getElementById("loginSection").classList.add("hidden");
-    document.getElementById("characterDisplay").classList.add("hidden");
-    document.getElementById("playerSection").classList.add("hidden");
-    document.getElementById("finishedSection").classList.add("hidden");
-    document.getElementById("loadingMsg").classList.remove("hidden"); // show spinner while SSE loads
+        document.getElementById("loginSection").classList.add("hidden");
+        document.getElementById("characterDisplay").classList.add("hidden");
+        document.getElementById("playerSection").classList.add("hidden");
+        document.getElementById("finishedSection").classList.add("hidden");
 
-    startAssignedSSE(); // SSE's first update will call handleAssignedUpdate and render correctly
-        } else {
-            document.getElementById("loginSection").classList.add("hidden");
-            document.getElementById("characterDisplay").classList.add("hidden");
-            document.getElementById("playerSection").classList.remove("hidden");
-            document.getElementById("totalCount").innerText = allAssignedVideos.length;
-            loadVideo(currentIndex);
-            startAssignedSSE();
-        }
+        // Show spinner while SSE loads fresh assignments
+        document.getElementById("loadingMsg").classList.remove("hidden");
+
+        startAssignedSSE();
+
     } else {
         stopAssignedSSE();
         stopAssignedPolling();
         localStorage.clear();
         document.getElementById("loginSection").classList.remove("hidden");
         document.getElementById("characterDisplay").classList.remove("hidden");
+        document.getElementById("loadingMsg").classList.add("hidden");
     }
-    
-    document.getElementById("loadingMsg").classList.add("hidden");
 }
 
 // Center the Content Review header only when the login view is visible
@@ -259,13 +252,12 @@ async function attemptLogin() {
 
         if (response.ok && result.success) {
             currentUser = result.username;
-            currentUid = uid; // Save the 10-digit ID used to log in
+            currentUid = uid;
             allAssignedVideos = result.assignedVideos;
             currentIndex = 0;
             videoDrafts = {};
             
             if (allAssignedVideos.length > 0) {
-                        // Save complete active session properties
                 localStorage.setItem("currentUser", currentUser);
                 localStorage.setItem("currentUid", currentUid);
                 localStorage.setItem("assignedVideos", JSON.stringify(allAssignedVideos));
@@ -277,9 +269,9 @@ async function attemptLogin() {
                 loadVideo(currentIndex);
                 startAssignedSSE();
             } else {
-                // Keep session active even when no assignments so SSE can detect new assignments
+                localStorage.setItem("currentUser", currentUser);
+                localStorage.setItem("currentUid", currentUid);
                 document.getElementById("finishedSection").classList.remove("hidden");
-                // Hide top info/ETA when showing the finished screen
                 const topInfoEl = document.getElementById('topInfo');
                 if (topInfoEl) topInfoEl.classList.add('hidden');
                 startAssignedSSE();
@@ -402,7 +394,6 @@ async function loadVideo(index) {
 
     const skipSection = document.getElementById("skipReasonSection");
     const skipReasonInput = document.getElementById("skipReason");
-    // Populate skip reason from the per-video draft, but collapse the skip panel by default
     skipReasonInput.value = draft.skipReason || "";
     if (draft.skipReason && String(draft.skipReason).trim() !== "") {
         skipSection.classList.remove("hidden");
@@ -438,7 +429,6 @@ function getTikTokVideoId(url) {
     if (longMatch && longMatch[1]) {
         return longMatch[1];
     }
-
     return null;
 }
 
@@ -664,17 +654,14 @@ function moveNext() {
             loadVideo(currentIndex);
         } else {
             // FINISHED ALL VIDEOS
-            // Keep session so user can navigate back; set index to end marker
             currentIndex = allAssignedVideos.length;
             localStorage.setItem("currentIndex", currentIndex);
 
             document.getElementById("playerSection").classList.add("hidden");
             document.getElementById("finishedSection").classList.remove("hidden");
-            // Hide top info/ETA when showing finished screen
             const topInfoFinished = document.getElementById('topInfo');
             if (topInfoFinished) topInfoFinished.classList.add('hidden');
 
-            // Ensure Previous is enabled when there are items
             const prevBtn = document.getElementById('prevVideoBtn');
             if (prevBtn) prevBtn.disabled = allAssignedVideos.length === 0;
         }
@@ -682,10 +669,8 @@ function moveNext() {
 }
 
 async function fetchAssignedVideos(uid, showLoading = true) {
-    // If cache was wiped, check our active runtime variable fallback
     const lookupUid = uid || currentUid;
     try {
-        const prevLen = allAssignedVideos.length;
         if (showLoading) {
             document.getElementById("loadingMsg").innerHTML = `<div class="spinner"></div><h3>Syncing</h3><p>Checking database entries...</p>`;
             document.getElementById("loadingMsg").classList.remove("hidden");
@@ -713,7 +698,6 @@ async function fetchAssignedVideos(uid, showLoading = true) {
                 return;
             }
 
-            // Re-establish session values to protect against page refreshes
             allAssignedVideos = newAssigned;
             videoDrafts = {};
             localStorage.setItem("currentUser", currentUser);
