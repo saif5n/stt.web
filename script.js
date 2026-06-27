@@ -168,21 +168,21 @@ function initializeApplication() {
         document.getElementById("totalCount").innerText = allAssignedVideos.length;
         loadVideo(currentIndex);
         return;
-    } else if (savedUser && savedVideos && savedUid) {
-        currentUser = savedUser;
-        currentUid = savedUid;
-        allAssignedVideos = JSON.parse(savedVideos);
-        videoDrafts = JSON.parse(localStorage.getItem("videoDrafts") || "{}");
-        currentIndex = savedIndex ? parseInt(savedIndex) : 0; 
-        // If there are no assigned videos or the index points past the end,
-        // show the finished screen but keep the session active so polling can detect new assignments.
-        if (allAssignedVideos.length === 0 || currentIndex >= allAssignedVideos.length) {
-            document.getElementById("loginSection").classList.add("hidden");
-            document.getElementById("characterDisplay").classList.add("hidden");
-            document.getElementById("playerSection").classList.add("hidden");
-            document.getElementById("finishedSection").classList.remove("hidden");
-            document.getElementById("totalCount").innerText = allAssignedVideos.length;
-            startAssignedSSE();
+    } else if (savedUser && savedUid) {
+    // Restore identity only, not stale video data
+    currentUser = savedUser;
+    currentUid = savedUid;
+    currentIndex = 0;
+    allAssignedVideos = [];
+    videoDrafts = {};
+
+    document.getElementById("loginSection").classList.add("hidden");
+    document.getElementById("characterDisplay").classList.add("hidden");
+    document.getElementById("playerSection").classList.add("hidden");
+    document.getElementById("finishedSection").classList.add("hidden");
+    document.getElementById("loadingMsg").classList.remove("hidden"); // show spinner while SSE loads
+
+    startAssignedSSE(); // SSE's first update will call handleAssignedUpdate and render correctly
         } else {
             document.getElementById("loginSection").classList.add("hidden");
             document.getElementById("characterDisplay").classList.add("hidden");
