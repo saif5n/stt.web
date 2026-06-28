@@ -260,6 +260,10 @@ async function loadVideo(index) {
     // Update the direct link icon in the header
     showDirectLink(rawUrl);
 
+    // Update the skip direct suggest link
+    const skipDirectBtn = document.getElementById('skipDirectBtn');
+    if (skipDirectBtn) skipDirectBtn.href = rawUrl || '#';
+
     prevButton.classList.remove("hidden");
     prevButton.disabled = index === 0;
 
@@ -315,8 +319,23 @@ async function loadVideo(index) {
     skipReasonInput.value = draft.skipReason || "";
     if (draft.skipReason && String(draft.skipReason).trim() !== "") {
         skipSection.classList.remove("hidden");
+        onSkipReasonChange();
     } else {
         skipSection.classList.add("hidden");
+        const suggest = document.getElementById('skipDirectSuggest');
+        if (suggest) suggest.classList.add('hidden');
+    }
+}
+
+// ── Show/hide direct-open suggest when skip reason is selected ──
+function onSkipReasonChange() {
+    const reason = document.getElementById('skipReason').value;
+    const suggest = document.getElementById('skipDirectSuggest');
+    if (!suggest) return;
+    if (reason) {
+        suggest.classList.remove('hidden');
+    } else {
+        suggest.classList.add('hidden');
     }
 }
 
@@ -481,6 +500,8 @@ function toggleSkip() {
     skipSection.classList.toggle("hidden");
     if (!skipSection.classList.contains("hidden")) {
         document.getElementById("skipReason").value = "";
+        const suggest = document.getElementById('skipDirectSuggest');
+        if (suggest) suggest.classList.add('hidden');
     }
 }
 

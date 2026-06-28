@@ -666,6 +666,50 @@ button:not(.refresh-btn):not(.btn-secondary):not(.btn-skip-toggle):not(.btn-chec
     text-decoration-color: var(--border-color);
 }
 
+/* ── Skip direct suggest ── */
+.skip-direct-suggest {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 12px;
+    padding: 10px 14px;
+    background: rgba(124, 111, 255, 0.06);
+    border: 1px solid rgba(124, 111, 255, 0.2);
+    border-radius: 10px;
+}
+
+.skip-direct-label {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    margin: 0;
+    flex: 1;
+    min-width: 120px;
+}
+
+.skip-direct-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(124, 111, 255, 0.35);
+    background: rgba(124, 111, 255, 0.1);
+    color: var(--primary);
+    text-decoration: none;
+    font-size: 0.82rem;
+    font-weight: 600;
+    white-space: nowrap;
+    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.skip-direct-link:hover {
+    background: rgba(124, 111, 255, 0.18);
+    color: var(--text-main);
+    border-color: rgba(124, 111, 255, 0.55);
+}
+
 /* ── Shared disabled state ── */
 button:not(.prev-video-btn):active:not(:disabled) {
     transform: translateY(0);
