@@ -2,7 +2,7 @@
 let allAssignedVideos = []; 
 let currentIndex = 0;
 let currentUser = "";
-let currentUid = ""; // Tracks the 10-digit database look-up key
+let currentUid = "";
 let videoDrafts = {};
 
 window.addEventListener('DOMContentLoaded', initializeApplication);
@@ -566,9 +566,9 @@ function moveNext() {
             if (topInfoFinished) topInfoFinished.classList.add('hidden');
             hideLogoutButton();
 
-            // Ensure Previous is enabled when there are items
+            // Hide Previous button on the finished screen
             const prevBtn = document.getElementById('prevVideoBtn');
-            if (prevBtn) prevBtn.disabled = allAssignedVideos.length === 0;
+            if (prevBtn) prevBtn.classList.add('hidden');
         }
     }, 300); 
 }
