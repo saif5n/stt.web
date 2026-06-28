@@ -497,6 +497,10 @@ iframe {
 }
 
 @media (min-width: 641px) {
+    .review-header-row h2 {
+        text-align: left;
+    }
+
     .player-grid {
         display: grid;
         grid-template-columns: minmax(320px, 1.8fr) minmax(260px, 1fr);
