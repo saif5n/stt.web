@@ -5,6 +5,14 @@ let currentUser = "";
 let currentUid = "";
 let videoDrafts = {};
 
+// Add this helper for the login/finish header view
+function setLoginViewHeader(isLoginView) {
+    const container = document.querySelector('.container');
+    if (container) {
+        container.classList.toggle('header-login-view', isLoginView);
+    }
+}
+
 window.addEventListener('DOMContentLoaded', initializeApplication);
 
 // Keyboard Listener for "Enter" key
@@ -82,6 +90,8 @@ function initializeApplication() {
         document.getElementById("loginSection").classList.add("hidden");
         document.getElementById("characterDisplay").classList.add("hidden");
         document.getElementById("playerSection").classList.remove("hidden");
+        setLoginViewHeader(false); // Player view
+        
         document.getElementById("totalCount").innerText = allAssignedVideos.length;
         showLogoutButton();
         loadVideo(currentIndex);
@@ -98,11 +108,14 @@ function initializeApplication() {
             document.getElementById("loginSection").classList.remove("hidden");
             document.getElementById("characterDisplay").classList.remove("hidden");
             document.getElementById("finishedSection").classList.add("hidden");
+            setLoginViewHeader(true); // Login view
             hideLogoutButton();
         } else {
             document.getElementById("loginSection").classList.add("hidden");
             document.getElementById("characterDisplay").classList.add("hidden");
             document.getElementById("playerSection").classList.remove("hidden");
+            setLoginViewHeader(false); // Player view
+            
             document.getElementById("totalCount").innerText = allAssignedVideos.length;
             showLogoutButton();
             loadVideo(currentIndex);
@@ -112,6 +125,7 @@ function initializeApplication() {
         localStorage.clear();
         document.getElementById("loginSection").classList.remove("hidden");
         document.getElementById("characterDisplay").classList.remove("hidden");
+        setLoginViewHeader(true); // Login view
         hideLogoutButton();
     }
     
@@ -119,8 +133,6 @@ function initializeApplication() {
 }
 
 // ── Silent background sync ──
-// Fetches the latest assignments and appends any new videos without
-// disrupting the user's current session or showing loading screens.
 async function silentSync(uid) {
     try {
         const response = await fetch('/api/get-videos', {
@@ -215,12 +227,16 @@ async function attemptLogin() {
                 localStorage.setItem("currentIndex", currentIndex);
 
                 document.getElementById("playerSection").classList.remove("hidden");
+                setLoginViewHeader(false); // Player view
+                
                 document.getElementById("totalCount").innerText = allAssignedVideos.length;
                 showLogoutButton();
                 loadVideo(currentIndex);
             } else {
                 localStorage.clear();
                 document.getElementById("finishedSection").classList.remove("hidden");
+                setLoginViewHeader(true); // Finished view
+                
                 const topInfoEl = document.getElementById('topInfo');
                 if (topInfoEl) topInfoEl.classList.add('hidden');
                 hideProgressBar();
@@ -230,6 +246,7 @@ async function attemptLogin() {
         } else {
             document.getElementById("loginSection").classList.remove("hidden");
             document.getElementById("characterDisplay").classList.remove("hidden");
+            setLoginViewHeader(true); // Login view
             
             if (loginError) {
                 loginError.innerText = result.message || "Invalid UID or Password.";
@@ -246,6 +263,7 @@ async function attemptLogin() {
         document.getElementById("loadingMsg").classList.add("hidden");
         document.getElementById("loginSection").classList.remove("hidden");
         document.getElementById("characterDisplay").classList.remove("hidden");
+        setLoginViewHeader(true); // Login view
 
         if (loginError) {
             loginError.innerText = "Error: " + error.message; 
@@ -599,6 +617,7 @@ function moveNext() {
         
         if (currentIndex < allAssignedVideos.length) {
             document.getElementById("playerSection").classList.remove("hidden");
+            setLoginViewHeader(false); // Player view
             loadVideo(currentIndex);
         } else {
             currentIndex = allAssignedVideos.length;
@@ -608,6 +627,8 @@ function moveNext() {
 
             document.getElementById("playerSection").classList.add("hidden");
             document.getElementById("finishedSection").classList.remove("hidden");
+            setLoginViewHeader(true); // Finished view
+            
             const topInfoFinished = document.getElementById('topInfo');
             if (topInfoFinished) topInfoFinished.classList.add('hidden');
             hideProgressBar();
@@ -660,6 +681,8 @@ async function fetchAssignedVideos(uid, showLoading = true) {
 
                 document.getElementById("finishedSection").classList.add("hidden");
                 document.getElementById("playerSection").classList.remove("hidden");
+                setLoginViewHeader(false); // Player view
+                
                 document.getElementById("totalCount").innerText = allAssignedVideos.length;
                 showLogoutButton();
                 loadVideo(currentIndex);
@@ -668,6 +691,8 @@ async function fetchAssignedVideos(uid, showLoading = true) {
                 localStorage.clear();
                 document.getElementById("finishedSection").classList.remove("hidden");
                 document.getElementById("playerSection").classList.add("hidden");
+                setLoginViewHeader(true); // Finished view
+                
                 const topInfo = document.getElementById('topInfo');
                 if (topInfo) topInfo.classList.add('hidden');
                 hideProgressBar();
@@ -719,6 +744,7 @@ function handleLogout() {
 
     document.getElementById('characterDisplay').classList.remove('hidden');
     document.getElementById('loginSection').classList.remove('hidden');
+    setLoginViewHeader(true); // Login view
 
     document.getElementById('uidInput').value = '';
     document.getElementById('passwordInput').value = '';

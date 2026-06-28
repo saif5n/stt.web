@@ -98,11 +98,28 @@ body {
     white-space: nowrap;
 }
 
+/* ── Login/finish view: normal centered header at all sizes ── */
+.header-login-view .review-header-row h2 {
+    font-size: 1.7rem;
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    text-align: center;
+    white-space: normal;
+}
+
 @media (max-width: 640px) {
     .review-header-row h2 {
         font-size: 1.1rem;
         letter-spacing: -0.02em;
         text-align: left;
+    }
+
+    /* Login/finish view keeps normal size and centered on mobile too */
+    .header-login-view .review-header-row h2 {
+        font-size: 1.7rem;
+        font-weight: 700;
+        letter-spacing: -0.025em;
+        text-align: center;
     }
 
     /* Hide the "Log out" text label, keep only the icon */
@@ -289,7 +306,7 @@ h2 {
 
 .progress-bar-fill {
     height: 100%;
-    background: linear-gradient(90deg, var(--primary), var(--primary-hover));
+    background: #C4C4C4;
     border-radius: 99px;
     width: 0%;
     transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
@@ -358,9 +375,12 @@ button.info-icon {
 .tooltip-icon::after {
     content: attr(data-tooltip);
     position: absolute;
-    bottom: 140%;
-    left: 50%;
-    transform: translateX(-50%);
+
+    /* Position tooltip to the right */
+    top: 50%;
+    left: calc(100% + 10px);
+    transform: translateY(-50%) translateX(-4px);
+
     background-color: #09090b;
     border: 1px solid var(--border-color);
     color: var(--text-main);
@@ -371,15 +391,17 @@ button.info-icon {
     font-family: 'Inter', sans-serif;
     font-weight: 400;
     white-space: normal;
-    width: max-content;
-    max-width: 240px;
+    width: 200px;
+    max-width: 200px;
     text-align: center;
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.2s ease, transform 0.2s ease;
     pointer-events: none;
     z-index: 100;
+
     text-transform: none;
     letter-spacing: normal;
 }
@@ -387,16 +409,21 @@ button.info-icon {
 .tooltip-icon::before {
     content: "";
     position: absolute;
-    bottom: 100%;
-    left: 50%;
-    transform: translateX(-50%);
+
+    /* Arrow pointing left toward the icon */
+    top: 50%;
+    left: calc(100% - 2px);
+    transform: translateY(-50%);
+
     border-width: 6px;
     border-style: solid;
-    border-color: var(--border-color) transparent transparent transparent;
+    border-color: transparent var(--border-color) transparent transparent;
+
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.2s ease;
-    z-index: 100;
+    pointer-events: none;
+    z-index: 101;
 }
 
 .tooltip-icon:hover::after,
@@ -406,7 +433,7 @@ button.info-icon {
 }
 
 .tooltip-icon:hover::after {
-    transform: translateX(-50%) translateY(-2px);
+    transform: translateY(-50%) translateX(0);
 }
 
 /* ── TikTok embed ── */
@@ -529,6 +556,11 @@ iframe {
 @media (min-width: 641px) {
     .review-header-row h2 {
         text-align: left;
+    }
+
+    /* Login/finish view overrides left-align on desktop too */
+    .header-login-view .review-header-row h2 {
+        text-align: center;
     }
 
     .player-grid {
