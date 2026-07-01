@@ -17,7 +17,7 @@
     </span>
     <span class="top-info-divider"></span>
     <span id="etaDisplay" class="top-info-eta-inline">--</span>
-    <button class="info-icon tooltip-icon" type="button" aria-label="ETA info" data-tooltip="The displayed time is an estimated completion time and may not be entirely accurate.">i</button>
+    <button class="info-icon tooltip-icon tooltip-icon--bottom" type="button" aria-label="ETA info" data-tooltip="The displayed time is an estimated completion time and may not be entirely accurate.">i</button>
 </div>
 
 <div id="progressBarContainer" class="progress-bar-container hidden">
@@ -68,7 +68,7 @@
         <div class="input-group">
             <label for="uidInput">
                 In-game UID
-                <span class="tooltip-icon" data-tooltip="The numeric user identification of your PUBG MOBILE account.">i</span>
+                <span class="tooltip-icon tooltip-icon--top" data-tooltip="The numeric user identification of your PUBG MOBILE account.">i</span>
             </label>
             <input type="text" id="uidInput" autocomplete="off" />
         </div>
@@ -76,7 +76,7 @@
         <div class="input-group">
             <label for="passwordInput">
                 Password
-                <span class="tooltip-icon" data-tooltip="The 4-digit password that you have been provided by the Survey Team Discord app.">i</span>
+                <span class="tooltip-icon tooltip-icon--top" data-tooltip="The 4-digit password that you have been provided by the Survey Team Discord app.">i</span>
             </label>
             <input type="password" id="passwordInput" autocomplete="off" />
         </div>
@@ -117,6 +117,7 @@
                         <select id="skipReason" onchange="onSkipReasonChange()">
                             <option value="">Select a reason</option>
                             <option value="The video is not loading">The video is not loading</option>
+                            <option value="The video is deleted/private">The video is deleted/private</option>
                             <option value="The video is unavailable in my region">The video is unavailable in my region</option>
                         </select>
 

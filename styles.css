@@ -233,6 +233,8 @@ h2 {
 
 /* ── Compact single-row status bar ── */
 .top-info-modal {
+    position: relative;
+    z-index: 10;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -353,7 +355,7 @@ button.info-icon {
     padding: 0;
 }
 
-/* ── Tooltips ── */
+/* ── Tooltips (base, defaults to right-side positioning) ── */
 .tooltip-icon {
     display: inline-flex;
     justify-content: center;
@@ -380,7 +382,7 @@ button.info-icon {
     content: attr(data-tooltip);
     position: absolute;
 
-    /* Position tooltip to the right */
+    /* Position tooltip to the right (default) */
     top: 50%;
     left: calc(100% + 10px);
     transform: translateY(-50%) translateX(-4px);
@@ -414,7 +416,7 @@ button.info-icon {
     content: "";
     position: absolute;
 
-    /* Arrow pointing left toward the icon */
+    /* Arrow pointing left toward the icon (default) */
     top: 50%;
     left: calc(100% - 2px);
     transform: translateY(-50%);
@@ -438,6 +440,55 @@ button.info-icon {
 
 .tooltip-icon:hover::after {
     transform: translateY(-50%) translateX(0);
+}
+
+/* ── Login page tooltips: displayed ABOVE the icon ── */
+.tooltip-icon--top::after {
+    top: auto;
+    bottom: calc(100% + 10px);
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%) translateY(4px);
+}
+
+.tooltip-icon--top::before {
+    top: auto;
+    bottom: calc(100% - 2px);
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+
+    /* Arrow pointing down toward the icon */
+    border-color: var(--border-color) transparent transparent transparent;
+}
+
+.tooltip-icon--top:hover::after {
+    transform: translateX(-50%) translateY(0);
+}
+
+/* ── ETA tooltip: displayed BELOW the icon ── */
+.tooltip-icon--bottom::after {
+    top: calc(100% + 10px);
+    bottom: auto;
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%) translateY(-4px);
+    z-index: 300;
+}
+
+.tooltip-icon--bottom::before {
+    top: calc(100% - 2px);
+    bottom: auto;
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+
+    /* Arrow pointing up toward the icon */
+    border-color: transparent transparent var(--border-color) transparent;
+}
+
+.tooltip-icon--bottom:hover::after {
+    transform: translateX(-50%) translateY(0);
 }
 
 /* ── TikTok embed ── */
