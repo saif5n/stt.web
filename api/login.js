@@ -33,7 +33,7 @@ module.exports = async function handler(req, res) {
         String(row[2]).trim() === String(password).trim()
     );
 
-    if (!validUser) return res.status(401).json({ success: false, message: 'Invalid UID or Password.' });
+    if (!validUser) return res.status(401).json({ success: false, message: 'The password or UID you entered is incorrect. Please ensure that you are using the correct credentials provided by the /crlogin command.' });
 
     const targetName = String(validUser[0]).trim(); // This is the Name from UIDs
 
